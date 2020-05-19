@@ -1,18 +1,18 @@
 #ifndef WLOG_COMMAND_H
 #define WLOG_COMMAND_H
 
-typedef struct {
-    int code;
-    const char *info;
-} result_t;
+#include "error.h"
+
+typedef error_t result_t;
 
 typedef struct {
     result_t (*execute)(int argc, char **argv);
     char *name;
     char *shortname;
+    char *description;
 } command_t;
 
 command_t command_for_str(char *str);
-int handle(result_t result);
+command_t *get_commands();
 
 #endif //WLOG_COMMAND_H

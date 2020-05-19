@@ -3,6 +3,21 @@
 #include <string.h>
 #include "worklog.h"
 #include "task.h"
+#include "command.h"
+#include "interactive_mode.h"
+#include "version.h"
+
+void print_current_time(unsigned int offset) {
+    time_t t = time(NULL);
+    const struct tm *tm = localtime(&t);
+    char str[6];
+    strftime(str, 5, "%H:%M", tm);
+    printf("\033[A\033[%uC\033[2m - %s\033[0m\n", offset, str);
+}
+
+void print_task_started_message(char *task_tag) {
+    printf("Started working on %s\n", task_tag);
+}
 
 void print_time_interval(double seconds) {
     long sec = lrint(round(seconds));
@@ -22,6 +37,8 @@ void print_time_spent_message(double seconds, char *tag_str) {
 }
 
 void print_summary(worklog_t *worklog, task_list_t *task_list) {
+    if (!task_list->len)
+        return;
     double spent[task_list->len];
     memset(spent, 0, sizeof(spent));
     double total_spent = 0;
@@ -34,6 +51,41 @@ void print_summary(worklog_t *worklog, task_list_t *task_list) {
         printf("%s: ", task_list->tag[i]);
         print_time_interval(spent[i]);
     }
-    printf("---\nTotal: ");
+    fputs("--------------\nTotal: ", stdout);
     print_time_interval(total_spent);
+}
+
+void print_interactive_mode_help() {
+    imode_command_t *imode_commands = get_imode_commands();
+
+    puts("\033[1mINTERACTIVE MODE\033[0m\n");
+    for (imode_command_t *command = imode_commands; command->name; ++command) {
+        if (command->arg_description) {
+            printf("  \033[1m%-8s\033[0m \033[4m%-4s\033[0m - %s\n", command->name, command->arg_description, command->description);
+        } else {
+            printf("  \033[1m%-13s\033[0m - %s\n", command->name, command->description);
+        }
+    }
+}
+
+void print_help() {
+    command_t *commands = get_commands();
+
+    puts("\033[1mSYNOPSIS\n"
+         "  wlog\033[0m [\033[4mcommand\033[0m]\n\n"
+         "\033[1mCOMMANDS\033[0m\n");
+    for (command_t *command = commands; command->execute; ++command) {
+        char *name = command->name ? command->name : "";
+        if (command->shortname) {
+            printf("  \033[1mwlog %-7s (%1s)\033[0m - %s\n", name, command->shortname, command->description);
+        } else {
+            printf("  \033[1mwlog %-11s\033[0m - %s\n", name, command->description);
+        }
+    }
+    putchar('\n');
+    print_interactive_mode_help();
+}
+
+void print_version() {
+    printf("wlog %s\033[2m, %s\033[0m\n", VERSION, RELEASE_DATE);
 }
