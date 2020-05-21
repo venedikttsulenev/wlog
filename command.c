@@ -26,7 +26,7 @@ result_t interactive_mode_command() {
                 result = error(ERR_UNKNOWN_COMMAND, tok);
             } else {
                 print_current_time(time_offset);
-                command->execute(&state);
+                result = command->execute(&state);
             }
         }
         handle(result);
