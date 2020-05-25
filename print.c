@@ -36,12 +36,15 @@ void print_time_spent_message(double seconds, char *tag_str) {
     print_time_interval(seconds);
 }
 
-void print_summary(worklog_t *worklog, task_list_t *task_list) {
+void print_summary(worklog_t *worklog, task_list_t *task_list, task_t current_task, double spent_on_current_task) {
     if (!task_list->len)
         return;
     double spent[task_list->len];
     memset(spent, 0, sizeof(spent));
     double total_spent = 0;
+    if (is_task(current_task)) {
+        total_spent = spent[current_task] = spent_on_current_task;
+    }
     for (int i = 0; i < worklog->len; ++i) {
         spent[worklog->entry[i].task] += worklog->entry[i].time_spent;
         total_spent += worklog->entry[i].time_spent;
@@ -87,5 +90,5 @@ void print_help() {
 }
 
 void print_version() {
-    printf("wlog %s\033[2m, %s\033[0m\n", VERSION, RELEASE_DATE);
+    puts("wlog "VERSION"\033[2m, "RELEASE_DATE"\033[0m");
 }

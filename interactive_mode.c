@@ -53,7 +53,8 @@ error_t continue_command(imode_state_t *state) {
 }
 
 error_t report_command(imode_state_t *state) {
-    print_summary(&state->worklog, &state->tasks);
+    double spent = difftime(time(NULL), state->time_started);
+    print_summary(&state->worklog, &state->tasks, state->current_task, spent);
     return OK;
 }
 
@@ -61,7 +62,7 @@ error_t stop_command(imode_state_t *state) {
     if (is_task(state->current_task)) {
         log_time_spent(&state->time_started, &state->worklog, state->current_task);
     }
-    print_summary(&state->worklog, &state->tasks);
+    print_summary(&state->worklog, &state->tasks, NO_TASK, 0);
     state->stopped = 1;
     return OK;
 }
