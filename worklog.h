@@ -17,6 +17,6 @@ typedef struct worklog {
 
 void init_worklog(worklog_t *worklog);
 
-double log_time_spent(time_t *timestamp, worklog_t *worklog, int task);
+double log_time_spent(time_t *since, worklog_t *worklog, int task);
 
 #endif //WLOG_WORKLOG_H

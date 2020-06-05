@@ -3,16 +3,18 @@
 #include <string.h>
 #include "worklog.h"
 #include "task.h"
-#include "command.h"
+#include "usage.h"
 #include "interactive_mode.h"
 #include "version.h"
 
-void print_current_time(unsigned int offset) {
+#define CURRENT_TIME_OFFSET "10"
+
+void print_current_time() {
     time_t t = time(NULL);
     const struct tm *tm = localtime(&t);
     char str[6];
     strftime(str, 5, "%H:%M", tm);
-    printf("\033[A\033[%uC\033[2m - %s\033[0m\n", offset, str);
+    printf("\033[A\033["CURRENT_TIME_OFFSET"C\033[2m - %s\033[0m\n", str);
 }
 
 void print_task_started_message(char *task_tag) {
@@ -59,10 +61,10 @@ void print_summary(worklog_t *worklog, task_list_t *task_list, task_t current_ta
 }
 
 void print_interactive_mode_help() {
-    imode_command_t *imode_commands = get_imode_commands();
+    command_t *imode_commands = get_imode_commands();
 
     puts("\033[1mINTERACTIVE MODE\033[0m\n");
-    for (imode_command_t *command = imode_commands; command->name; ++command) {
+    for (command_t *command = imode_commands; command_exists(command); ++command) {
         if (command->arg_description) {
             printf("  \033[1m%-8s\033[0m \033[4m%-4s\033[0m - %s\n", command->name, command->arg_description, command->description);
         } else {
@@ -72,12 +74,12 @@ void print_interactive_mode_help() {
 }
 
 void print_help() {
-    command_t *commands = get_commands();
+    command_t *commands = get_supported_commands();
 
     puts("\033[1mSYNOPSIS\n"
          "  wlog\033[0m [\033[4mcommand\033[0m]\n\n"
          "\033[1mCOMMANDS\033[0m\n");
-    for (command_t *command = commands; command->execute; ++command) {
+    for (command_t *command = commands; command_exists(command); ++command) {
         char *name = command->name ? command->name : "";
         if (command->shortname) {
             printf("  \033[1mwlog %-7s (%1s)\033[0m - %s\n", name, command->shortname, command->description);
