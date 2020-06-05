@@ -60,35 +60,32 @@ void print_summary(worklog_t *worklog, task_list_t *task_list, task_t current_ta
     print_time_interval(total_spent);
 }
 
-void print_interactive_mode_help() {
-    command_t *imode_commands = get_imode_commands();
-
-    puts("\033[1mINTERACTIVE MODE\033[0m\n");
-    for (command_t *command = imode_commands; command_exists(command); ++command) {
-        if (command->arg_description) {
-            printf("  \033[1m%-8s\033[0m \033[4m%-4s\033[0m - %s\n", command->name, command->arg_description, command->description);
-        } else {
-            printf("  \033[1m%-13s\033[0m - %s\n", command->name, command->description);
+void _print_help(command_t *commands) {
+    for (command_t *command = commands; command_exists(command); ++command) {
+        if (command->name) {
+            if (command->shortname) {
+                printf("  \033[1m%-8s %-3s\033[0m - %s\n", command->name, command->shortname, command->description);
+            } else {
+                printf("  \033[1m%-12s\033[0m - %s\n", command->name, command->description);
+            }
         }
     }
 }
 
-void print_help() {
-    command_t *commands = get_supported_commands();
+void print_interactive_mode_help() {
+    puts("\033[1mINTERACTIVE MODE\033[0m");
+    _print_help(get_imode_commands());
+}
 
+void print_help() {
     puts("\033[1mSYNOPSIS\n"
-         "  wlog\033[0m [\033[4mcommand\033[0m]\n\n"
-         "\033[1mCOMMANDS\033[0m\n");
-    for (command_t *command = commands; command_exists(command); ++command) {
-        char *name = command->name ? command->name : "";
-        if (command->shortname) {
-            printf("  \033[1mwlog %-7s (%1s)\033[0m - %s\n", name, command->shortname, command->description);
-        } else {
-            printf("  \033[1mwlog %-11s\033[0m - %s\n", name, command->description);
-        }
-    }
+         "  wlog\033[0m         -- Run interactive mode\n"
+         "  \033[1mwlog\033[0m \033[4mcommand\033[0m -- Run command\n\n"
+         "\033[1mCOMMANDS\033[0m");
+    _print_help(get_supported_commands());
     putchar('\n');
     print_interactive_mode_help();
+    putchar('\n');
 }
 
 void print_version() {

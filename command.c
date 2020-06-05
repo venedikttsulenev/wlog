@@ -12,8 +12,8 @@ command_t command_for_name(char *name, command_t *commands, command_t *default_c
     if (NULL == name)
         return *default_command;
     for (command_t *command = commands; command->execute != NULL; ++command) {
-        if (command->name || command->shortname) {
-            if (0 == strcmp(name, command->shortname) || 0 == strcmp(name, command->name))
+        if ((command->shortname && (0 == strcmp(name, command->shortname))) ||
+            (command->name      && (0 == strcmp(name, command->name)))) {
                 return *command;
         }
     }
