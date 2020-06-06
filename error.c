@@ -1,4 +1,5 @@
 #include "error.h"
+#include "print.h"
 #include <stdio.h>
 
 static const char *ERR_MSG[] = {
@@ -11,11 +12,7 @@ static const char *ERR_MSG[] = {
 
 int handle(error_t error) {
     if (error.code) {
-        if (error.info) {
-            printf("%s: %s\n", ERR_MSG[error.code], error.info);
-        } else {
-            printf("%s\n", ERR_MSG[error.code]);
-        }
+        print_error(ERR_MSG[error.code], error.info);
     }
     return error.code;
 }

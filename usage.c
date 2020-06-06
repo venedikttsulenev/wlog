@@ -1,13 +1,20 @@
+#include <stdio.h>
 #include "usage.h"
-#include "interactive_mode.h"
+#include "interactive.h"
 #include "print.h"
+
+static command_t COMMANDS[];
 
 result_t interactive_mode_command() {
     return run_interactive_mode();
 }
 
 result_t print_help_command() {
-    print_help();
+    puts("\033[1mSYNOPSIS\n"
+         "  wlog\033[0m         - Run interactive mode\n"
+         "  \033[1mwlog\033[0m \033[4mcommand\033[0m - Run command\n\n"
+         "\033[1mCOMMANDS\033[0m");
+    print_help(COMMANDS);
     return OK;
 }
 
@@ -25,8 +32,4 @@ static command_t COMMANDS[] = {
 
 command_t get_command(char *name) {
     return command_for_name(name, COMMANDS, &COMMANDS[0]);
-}
-
-command_t *get_supported_commands() {
-    return COMMANDS;
 }

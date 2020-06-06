@@ -2,21 +2,19 @@
 #define WLOG_WORKLOG_H
 
 #include <time.h>
+#include "tasks.h"
 
-#define MAX_WORKLOG_LEN 128
+typedef struct worklog_summary {
+    int size;
+    double *spent;
+    double total_spent;
+} worklog_summary_t;
 
-typedef struct worklog_entry {
-    int task;
-    double time_spent;
-} worklog_entry_t;
+void init_worklog();
 
-typedef struct worklog {
-    int len;
-    worklog_entry_t entry[MAX_WORKLOG_LEN];
-} worklog_t;
+double log_time_spent(time_t *since, task_id_t task_id);
+worklog_summary_t get_worklog_summary();
 
-void init_worklog(worklog_t *worklog);
-
-double log_time_spent(time_t *since, worklog_t *worklog, int task);
+void free_worklog();
 
 #endif //WLOG_WORKLOG_H

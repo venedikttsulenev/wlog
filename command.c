@@ -2,11 +2,11 @@
 #include "command.h"
 #include "error.h"
 
-result_t unknown_command(int argc, char **argv) {
-    return error(ERR_UNKNOWN_COMMAND, argv[1]);
+result_t unknown(const char *name) {
+    return error(ERR_UNKNOWN_COMMAND, name);
 }
 
-#define UNKNOWN_COMMAND (command_t) {unknown_command};
+#define unknown_command(name) (command_t) {unknown, name};
 
 command_t command_for_name(char *name, command_t *commands, command_t *default_command) {
     if (NULL == name)
@@ -17,9 +17,13 @@ command_t command_for_name(char *name, command_t *commands, command_t *default_c
                 return *command;
         }
     }
-    return UNKNOWN_COMMAND;
+    return unknown_command(name);
 }
 
 int command_exists(command_t *command) {
     return command->execute != NULL;
+}
+
+result_t execute_command(command_t command) {
+    return command.execute(command.name);
 }

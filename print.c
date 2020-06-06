@@ -2,23 +2,30 @@
 #include <math.h>
 #include <string.h>
 #include "worklog.h"
-#include "task.h"
+#include "tasks.h"
 #include "usage.h"
-#include "interactive_mode.h"
 #include "version.h"
 
-#define CURRENT_TIME_OFFSET "10"
+#define NORMAL "\033[0m"
+#define BOLD "\033[1m"
+#define FAINT "\033[2m"
+
+#define RED "\033[38;5;52m"
+#define GREY "\033[38;5;241m"
+#define MAGENTA "\033[38;5;94m"
+#define GREEN "\033[38;5;22m"
 
 void print_current_time() {
     time_t t = time(NULL);
     const struct tm *tm = localtime(&t);
     char str[6];
-    strftime(str, 5, "%H:%M", tm);
-    printf("\033[A\033["CURRENT_TIME_OFFSET"C\033[2m - %s\033[0m\n", str);
+    strftime(str, 6, "%H:%M", tm);
+    printf(GREY"%s "NORMAL, str);
 }
 
 void print_task_started_message(char *task_tag) {
-    printf("Started working on %s\n", task_tag);
+    print_current_time();
+    printf("Started working on "GREEN"%s\n"NORMAL, task_tag);
 }
 
 void print_time_interval(double seconds) {
@@ -27,67 +34,95 @@ void print_time_interval(double seconds) {
     long hour = min / 60L;
     if (hour > 0L) {
         min -= 60L * hour;
-        printf("%ldh %ldm\n", hour, min);
+        printf(MAGENTA"%ldh %ldm"NORMAL, hour, min);
     } else {
-        printf("%ldm\n", min);
+        printf(MAGENTA"%ldm"NORMAL, min);
     }
 }
 
-void print_time_spent_message(double seconds, char *tag_str) {
-    printf("Time spent working on %s: ", tag_str);
+void print_time_spent_message(double seconds, char *task_tag) {
+    print_current_time();
     print_time_interval(seconds);
+    printf(" spent working on "GREEN"%s\n"NORMAL, task_tag);
 }
 
-void print_summary(worklog_t *worklog, task_list_t *task_list, task_t current_task, double spent_on_current_task) {
-    if (!task_list->len)
-        return;
-    double spent[task_list->len];
-    memset(spent, 0, sizeof(spent));
-    double total_spent = 0;
-    if (is_task(current_task)) {
-        total_spent = spent[current_task] = spent_on_current_task;
+void print_summary(worklog_summary_t summary) {
+    print_current_time();
+    if (summary.size) {
+        fputs("Time spent: ", stdout);
+        print_time_interval(summary.total_spent);
+        putchar('\n');
+        if (summary.size > 1) {
+            int max_tag_len = 0;
+            for (task_id_t t = 0; t < summary.size; ++t) {
+                int len = (int) strlen(get_task_tag(t));
+                if (len > max_tag_len) {
+                    max_tag_len = len;
+                }
+            }
+            for (task_id_t t = 0; t < summary.size; ++t) {
+                print_current_time();
+                printf(GREEN"%*s"NORMAL": ", max_tag_len, get_task_tag(t));
+                print_time_interval(summary.spent[t]);
+                putchar('\n');
+            }
+        }
+    } else {
+        puts("Nothing yet");
     }
-    for (int i = 0; i < worklog->len; ++i) {
-        spent[worklog->entry[i].task] += worklog->entry[i].time_spent;
-        total_spent += worklog->entry[i].time_spent;
-    }
-    puts("Time spent:");
-    for (int i = 0; i < task_list->len; ++i) {
-        printf("%s: ", task_list->tag[i]);
-        print_time_interval(spent[i]);
-    }
-    fputs("--------------\nTotal: ", stdout);
-    print_time_interval(total_spent);
 }
 
-void _print_help(command_t *commands) {
+void set_print_mode(char c) {
+    putchar('\033');
+    putchar('[');
+    putchar(c);
+    putchar('m');
+}
+
+void set_underlined() {
+    set_print_mode('4');
+}
+
+void set_normal() {
+    set_print_mode('0');
+}
+
+void print_help(command_t *commands) {
     for (command_t *command = commands; command_exists(command); ++command) {
         if (command->name) {
             if (command->shortname) {
-                printf("  \033[1m%-8s %-3s\033[0m - %s\n", command->name, command->shortname, command->description);
+                printf(FAINT"%3s"NORMAL" "BOLD"%s "NORMAL, command->shortname, command->name);
             } else {
-                printf("  \033[1m%-12s\033[0m - %s\n", command->name, command->description);
+                printf("    "BOLD"%s "NORMAL, command->name);
+            }
+            if (command->arg_description) {
+                set_underlined();
+                for (char *c = command->arg_description; *c != '\0'; ++c) {
+                    if (*c == ' ') {
+                        set_normal();
+                        putchar(*c);
+                        set_underlined();
+                    } else {
+                        putchar(*c);
+                    }
+                }
+                set_normal();
+                printf("%*s - %s \n", 9 - (int) (strlen(command->name) + strlen(command->arg_description)), "", command->description);
+            } else {
+                printf("%*s - %s \n", 9 - (int) strlen(command->name), "", command->description);
             }
         }
     }
 }
 
-void print_interactive_mode_help() {
-    puts("\033[1mINTERACTIVE MODE\033[0m");
-    _print_help(get_imode_commands());
-}
-
-void print_help() {
-    puts("\033[1mSYNOPSIS\n"
-         "  wlog\033[0m         -- Run interactive mode\n"
-         "  \033[1mwlog\033[0m \033[4mcommand\033[0m -- Run command\n\n"
-         "\033[1mCOMMANDS\033[0m");
-    _print_help(get_supported_commands());
-    putchar('\n');
-    print_interactive_mode_help();
-    putchar('\n');
+void print_error(const char *message, const char *info) {
+    if (info) {
+        printf(RED"%s: %s\n"NORMAL, message, info);
+    } else {
+        printf(RED"%s\n"NORMAL, message);
+    }
 }
 
 void print_version() {
-    puts("wlog "VERSION"\033[2m, "RELEASE_DATE"\033[0m");
+    puts("wlog "VERSION FAINT", "RELEASE_DATE NORMAL);
 }
