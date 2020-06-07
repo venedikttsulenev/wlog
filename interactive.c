@@ -51,7 +51,7 @@ result_t run_interactive_mode() {
             result = error(ERR_INPUT, NULL);
         } else {
             char *tok = strtok(input_str, TOKEN_DELIMETERS);
-            if (tok) {
+            if (tok && (*tok != '#')) {
                 add_history(input_str);
                 command_t command = command_for_name(tok, IMODE_COMMANDS, NULL);
                 result = execute_command(command);
@@ -128,8 +128,7 @@ result_t quit_command() {
 }
 
 result_t help_command() {
-    puts("\033[1mINTERACTIVE MODE\033[0m");
-    print_help(IMODE_COMMANDS);
+    print_imode_help(IMODE_COMMANDS);
     return OK;
 }
 

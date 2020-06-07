@@ -9,6 +9,7 @@
 #define NORMAL "\033[0m"
 #define BOLD "\033[1m"
 #define FAINT "\033[2m"
+#define UNDERLINED "\033[4m"
 
 #define RED "\033[38;5;52m"
 #define GREY "\033[38;5;241m"
@@ -87,7 +88,19 @@ void set_normal() {
     set_print_mode('0');
 }
 
-void print_help(command_t *commands) {
+void print_error(const char *message, const char *info) {
+    if (info) {
+        printf(RED"%s: %s\n"NORMAL, message, info);
+    } else {
+        printf(RED"%s\n"NORMAL, message);
+    }
+}
+
+void print_version() {
+    puts("wlog "VERSION FAINT", "RELEASE_DATE NORMAL);
+}
+
+void print_commands(command_t *commands) {
     for (command_t *command = commands; command_exists(command); ++command) {
         if (command->name) {
             if (command->shortname) {
@@ -115,14 +128,17 @@ void print_help(command_t *commands) {
     }
 }
 
-void print_error(const char *message, const char *info) {
-    if (info) {
-        printf(RED"%s: %s\n"NORMAL, message, info);
-    } else {
-        printf(RED"%s\n"NORMAL, message);
-    }
+void print_help(command_t *commands) {
+    puts(BOLD"SYNOPSIS\n"
+         "  wlog"NORMAL"         - Run interactive mode\n"
+         "  "BOLD"wlog"NORMAL" "UNDERLINED"command"NORMAL" - Run command\n\n"
+         BOLD"COMMANDS"NORMAL);
+    print_commands(commands);
 }
 
-void print_version() {
-    puts("wlog "VERSION FAINT", "RELEASE_DATE NORMAL);
+void print_imode_help(command_t *commands) {
+    puts(BOLD"INTERACTIVE MODE\n"NORMAL);
+    print_commands(commands);
+    puts("\nTo leave a "BOLD"comment"NORMAL" use '#' symbol:\n"
+         "  > # Comment\n");
 }

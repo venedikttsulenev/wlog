@@ -10,10 +10,6 @@ result_t interactive_mode_command() {
 }
 
 result_t print_help_command() {
-    puts("\033[1mSYNOPSIS\n"
-         "  wlog\033[0m         - Run interactive mode\n"
-         "  \033[1mwlog\033[0m \033[4mcommand\033[0m - Run command\n\n"
-         "\033[1mCOMMANDS\033[0m");
     print_help(COMMANDS);
     return OK;
 }
