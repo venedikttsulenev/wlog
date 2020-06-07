@@ -1,6 +1,5 @@
 #include <string.h>
 #include "command.h"
-#include "error.h"
 
 result_t unknown(const char *name) {
     return error(ERR_UNKNOWN_COMMAND, name);

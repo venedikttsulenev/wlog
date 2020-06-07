@@ -1,9 +1,7 @@
+#include "print.h"
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
-#include "worklog.h"
-#include "tasks.h"
-#include "usage.h"
 #include "version.h"
 
 #define NORMAL "\033[0m"
