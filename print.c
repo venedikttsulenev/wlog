@@ -142,3 +142,7 @@ void print_imode_help(command_t *commands) {
     puts("\nTo leave a "BOLD"comment"NORMAL" use '#' symbol:\n"
          "  > # Comment\n");
 }
+
+void print_greeting() {
+    puts("Welcome to wlog "VERSION"!\nType 'help' or 'h' to see list of available commands");
+}

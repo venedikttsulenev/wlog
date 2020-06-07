@@ -53,6 +53,7 @@ void init_interactive_mode() {
 result_t run_interactive_mode() {
     char *input_str;
     init_interactive_mode();
+    print_greeting();
     do {
         result_t result = OK;
         input_str = readline(PROMPT);

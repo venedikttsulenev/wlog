@@ -12,5 +12,6 @@ void print_error(const char *message, const char *info);
 void print_version();
 void print_help(command_t *commands);
 void print_imode_help(command_t *commands);
+void print_greeting();
 
 #endif //WLOG_PRINT_H
