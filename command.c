@@ -7,7 +7,7 @@ result_t unknown(const char *name) {
 
 #define unknown_command(name) (command_t) {unknown, name};
 
-command_t command_for_name(char *name, command_t *commands, command_t *default_command) {
+command_t cmd_for_name(char *name, command_t *commands, command_t *default_command) {
     if (NULL == name)
         return *default_command;
     for (command_t *command = commands; command->execute != NULL; ++command) {
@@ -19,10 +19,10 @@ command_t command_for_name(char *name, command_t *commands, command_t *default_c
     return unknown_command(name);
 }
 
-int command_exists(command_t *command) {
+int cmd_exists(command_t *command) {
     return command->execute != NULL;
 }
 
-result_t execute_command(command_t command) {
+result_t cmd_execute(command_t command) {
     return command.execute(command.name);
 }

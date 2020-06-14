@@ -9,11 +9,9 @@
 
 typedef int task_id_t;
 
-void init_tasks();
+task_id_t ts_find_or_create(char *tag);
+char *ts_get_tag(task_id_t task_id);
 
-task_id_t find_or_create_task(char *tag);
-char *get_task_tag(task_id_t task_id);
-
-void free_tasks();
+void ts_free();
 
 #endif //WLOG_TASKS_H

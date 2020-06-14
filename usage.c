@@ -27,5 +27,5 @@ static command_t COMMANDS[] = {
 };
 
 command_t get_command(char *name) {
-    return command_for_name(name, COMMANDS, &COMMANDS[0]);
+    return cmd_for_name(name, COMMANDS, &COMMANDS[0]);
 }

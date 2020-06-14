@@ -45,7 +45,7 @@ void print_time_spent_message(double seconds, char *task_tag) {
     printf(" spent working on "GREEN"%s\n"NORMAL, task_tag);
 }
 
-void print_summary(worklog_summary_t summary) {
+void print_summary(wl_summary_t summary) {
     print_current_time();
     if (summary.size) {
         fputs("Time spent: ", stdout);
@@ -54,14 +54,14 @@ void print_summary(worklog_summary_t summary) {
         if (summary.size > 1) {
             int max_tag_len = 0;
             for (task_id_t t = 0; t < summary.size; ++t) {
-                int len = (int) strlen(get_task_tag(t));
+                int len = (int) strlen(ts_get_tag(t));
                 if (len > max_tag_len) {
                     max_tag_len = len;
                 }
             }
             for (task_id_t t = 0; t < summary.size; ++t) {
                 print_current_time();
-                printf(GREEN"%*s"NORMAL": ", max_tag_len, get_task_tag(t));
+                printf(GREEN"%*s"NORMAL": ", max_tag_len, ts_get_tag(t));
                 print_time_interval(summary.spent[t]);
                 putchar('\n');
             }
@@ -99,7 +99,7 @@ void print_version() {
 }
 
 void print_commands(command_t *commands) {
-    for (command_t *command = commands; command_exists(command); ++command) {
+    for (command_t *command = commands; cmd_exists(command); ++command) {
         if (command->name) {
             if (command->shortname) {
                 printf(FAINT"%3s"NORMAL" "BOLD"%s "NORMAL, command->shortname, command->name);

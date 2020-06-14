@@ -4,17 +4,16 @@
 #include <time.h>
 #include "tasks.h"
 
-typedef struct worklog_summary {
+typedef struct wl_summary {
     int size;
-    double *spent;
     double total_spent;
-} worklog_summary_t;
+    double *spent;
+} wl_summary_t;
 
-void init_worklog();
+double wl_log_time_spent(time_t *since, task_id_t task_id);
+double wl_get_time_spent(task_id_t task_id);
+wl_summary_t wl_get_summary();
 
-double log_time_spent(time_t *since, task_id_t task_id);
-worklog_summary_t get_worklog_summary();
-
-void free_worklog();
+void wl_free();
 
 #endif //WLOG_WORKLOG_H

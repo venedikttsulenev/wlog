@@ -8,37 +8,44 @@
 
 typedef char tag_t[MAX_TAG_LENGTH];
 
-static int t_capacity = DEFAULT_CAPACITY;
-static int t_count = 0;
-static tag_t *t_tag = NULL;
+static int ts_init_ran = 0;
 
-void init_tasks() {
-    t_tag = malloc(t_capacity * sizeof(tag_t));
+static int ts_capacity = DEFAULT_CAPACITY;
+static int ts_count = 0;
+static tag_t *ts_tag = NULL;
+
+void ts_init() {
+    ts_tag = malloc(ts_capacity * sizeof(tag_t));
 }
 
 void grow() {
-    t_capacity += CAPACITY_GROW_STEP;
-    t_tag = realloc(t_tag, t_capacity * sizeof(tag_t));
+    ts_capacity += CAPACITY_GROW_STEP;
+    ts_tag = realloc(ts_tag, ts_capacity * sizeof(tag_t));
 }
 
-task_id_t find_or_create_task(char *tag) {
-    for (int i = 0; i < t_count; ++i) {
-        if (0 == strcmp(tag, t_tag[i]))
+task_id_t ts_find_or_create(char *tag) {
+    if (!ts_init_ran) {
+        ts_init();
+    }
+    for (int i = 0; i < ts_count; ++i) {
+        if (0 == strcmp(tag, ts_tag[i]))
             return i;
     }
-    if (t_count == t_capacity) {
+    if (ts_count == ts_capacity) {
         grow();
     }
-    strncpy(t_tag[t_count], tag, MAX_TAG_LENGTH);
-    return t_count++;
+    strncpy(ts_tag[ts_count], tag, MAX_TAG_LENGTH);
+    return ts_count++;
 }
 
-char *get_task_tag(task_id_t task_id) {
-    if (task_id >= 0 && task_id < t_count)
-        return t_tag[task_id];
+char *ts_get_tag(task_id_t task_id) {
+    if (task_id >= 0 && task_id < ts_count)
+        return ts_tag[task_id];
     return NULL;
 }
 
-void free_tasks() {
-    free(t_tag);
+void ts_free() {
+    if (ts_tag) {
+        free(ts_tag);
+    }
 }
