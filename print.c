@@ -53,15 +53,15 @@ void print_summary(wl_summary_t summary) {
         putchar('\n');
         if (summary.size > 1) {
             int max_tag_len = 0;
-            for (task_id_t t = 0; t < summary.size; ++t) {
-                int len = (int) strlen(ts_get_tag(t));
+            for (int t = 0; t < summary.size; ++t) {
+                int len = (int) strlen(summary.tag[t]);
                 if (len > max_tag_len) {
                     max_tag_len = len;
                 }
             }
-            for (task_id_t t = 0; t < summary.size; ++t) {
+            for (int t = 0; t < summary.size; ++t) {
                 print_current_time();
-                printf(GREEN"%*s"NORMAL": ", max_tag_len, ts_get_tag(t));
+                printf(GREEN"%*s"NORMAL": ", max_tag_len, summary.tag[t]);
                 print_time_interval(summary.spent[t]);
                 putchar('\n');
             }

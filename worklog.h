@@ -2,16 +2,20 @@
 #define WLOG_WORKLOG_H
 
 #include <time.h>
-#include "tasks.h"
+
+#define WL_MAX_TAG_LENGTH 32
+
+typedef char wl_tag_t[WL_MAX_TAG_LENGTH];
 
 typedef struct wl_summary {
     int size;
     double total_spent;
     double *spent;
+    wl_tag_t *tag;
 } wl_summary_t;
 
-double wl_log_time_spent(time_t *since, task_id_t task_id);
-double wl_get_time_spent(task_id_t task_id);
+double wl_log_time_spent(time_t *since, char *tag);
+double wl_get_time_spent(char *tag);
 wl_summary_t wl_get_summary();
 
 void wl_free();

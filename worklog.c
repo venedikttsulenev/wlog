@@ -2,52 +2,72 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define WL_DEFAULT_CAPACITY 128
 #define WL_CAPACITY_GROW_STEP 32
 
 static int wl_init_ran = 0;
-
-static int wl_capacity = 128;
-static wl_summary_t wl_summary = {0, 0, NULL};
-
-void grow_worklog() {
-    wl_capacity += WL_CAPACITY_GROW_STEP;
-    wl_summary.spent = realloc(wl_summary.spent, wl_capacity);
-    memset(wl_summary.spent + wl_capacity - WL_CAPACITY_GROW_STEP, 0, WL_CAPACITY_GROW_STEP * sizeof(double));
-}
+static int wl_capacity = WL_DEFAULT_CAPACITY;
+static int wl_size = 0;
+static double wl_total_spent = 0;
+static double *wl_spent = NULL;
+static wl_tag_t *wl_tag = NULL;
 
 void wl_init() {
-    wl_summary.spent = calloc(wl_capacity, sizeof(double));
+    wl_spent = malloc(wl_capacity * sizeof(double));
+    wl_tag = malloc(wl_capacity * sizeof(wl_tag_t));
     wl_init_ran = 1;
 }
 
-double wl_log_time_spent(time_t *since, task_id_t task_id) {
+void wl_grow() {
+    wl_capacity += WL_CAPACITY_GROW_STEP;
+    wl_spent = realloc(wl_spent, wl_capacity);
+    wl_tag = realloc(wl_tag, wl_capacity);
+}
+
+int wl_index(char *tag) {
+    for (int i = 0; i < wl_size; ++i) {
+        if (strcmp(tag, wl_tag[i]) == 0) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+double wl_log_time_spent(time_t *since, char *tag) {
     if (!wl_init_ran) {
         wl_init();
     }
-    if (task_id >= wl_summary.size) {
-        if (task_id >= wl_capacity) {
-            grow_worklog();
+    int index = wl_index(tag);
+    if (-1 == index) {
+        if (wl_size == wl_capacity) {
+            wl_grow();
         }
-        wl_summary.size = task_id + 1;
+        index = wl_size;
+        wl_spent[index] = 0;
+        strncpy(wl_tag[index], tag, WL_MAX_TAG_LENGTH);
+        wl_size += 1;
     }
     time_t current = time(NULL);
     double delta = difftime(current, *since);
     *since = current;
-    wl_summary.spent[task_id] += delta;
-    wl_summary.total_spent += delta;
+    wl_spent[index] += delta;
+    wl_total_spent += delta;
     return delta;
 }
 
 wl_summary_t wl_get_summary() {
-    return wl_summary;
+    return (wl_summary_t) {wl_size, wl_total_spent, wl_spent, wl_tag};
 }
 
-double wl_get_time_spent(task_id_t task_id) {
-    return wl_summary.spent[task_id];
+double wl_get_time_spent(char *tag) {
+    return wl_spent[wl_index(tag)];
 }
 
 void wl_free() {
-    if (wl_summary.spent) {
-        free(wl_summary.spent);
+    if (wl_spent) {
+        free(wl_spent);
+    }
+    if (wl_tag) {
+        free(wl_tag);
     }
 }

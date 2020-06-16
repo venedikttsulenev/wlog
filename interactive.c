@@ -5,13 +5,13 @@
 #include <readline/readline.h>
 #include "print.h"
 #include "worklog.h"
-#include "tasks.h"
 
 #define CMD_COUNT 8
 
-static task_id_t i_current_task;
-static task_id_t i_prev_task;
+static wl_tag_t i_current_task;
 static time_t i_current_task_start_time;
+static int i_break;
+static int i_no_task_yet;
 static int i_stopped;
 static command_t IMODE_COMMANDS[CMD_COUNT + 1];
 
@@ -37,9 +37,9 @@ char **get_completions(const char *text, int start, int end) {
 }
 
 void init_interactive_mode() {
-    i_current_task = NO_TASK;
-    i_prev_task = NO_TASK;
     i_current_task_start_time = 0;
+    i_break = 0;
+    i_no_task_yet = 1;
     i_stopped = 0;
     rl_attempted_completion_function = get_completions;
     using_history();
@@ -71,7 +71,6 @@ result_t run_interactive_mode() {
         handle(result);
     } while (!i_stopped);
     wl_free();
-    ts_free();
     return OK;
 }
 
@@ -81,45 +80,48 @@ result_t task_command() {
         return error(ERR_ARGUMENTS, "expected 1");
     }
 
-    task_id_t new_task = ts_find_or_create(arg);
-    if (new_task != i_current_task) {
-        if (is_task(i_current_task)) {
+    if (strcmp(arg, i_current_task) != 0) {
+        if (!i_break && !i_no_task_yet) {
             wl_log_time_spent(&i_current_task_start_time, i_current_task);
-            print_time_spent_message(wl_get_time_spent(i_current_task), ts_get_tag(i_current_task));
+            print_time_spent_message(wl_get_time_spent(i_current_task), i_current_task);
         } else {
+            i_no_task_yet = 0;
+            i_break = 0;
             i_current_task_start_time = time(NULL);
         }
-        i_current_task = new_task;
-        print_task_started_message(ts_get_tag(i_current_task));
+        strncpy(i_current_task, arg, WL_MAX_TAG_LENGTH);
+        print_task_started_message(i_current_task);
     }
     return OK;
 }
 
 result_t break_command() {
-    if (no_task(i_current_task)) {
+    if (i_break || i_no_task_yet) {
         return error(ERR_LOGIC, "there's no task being worked on");
     }
 
     wl_log_time_spent(&i_current_task_start_time, i_current_task);
-    print_time_spent_message(wl_get_time_spent(i_current_task), ts_get_tag(i_current_task));
-    i_prev_task = i_current_task;
-    i_current_task = BREAK_TASK;
+    print_time_spent_message(wl_get_time_spent(i_current_task), i_current_task);
+    i_break = 1;
     return OK;
 }
 
 result_t continue_command() {
-    if (i_current_task != BREAK_TASK) {
+    if (i_no_task_yet) {
+        return error(ERR_LOGIC, "there's no task to continue work on");
+    }
+    if (!i_break) {
         return error(ERR_LOGIC, "there is already task being worked on");
     }
 
     i_current_task_start_time = time(NULL);
-    i_current_task = i_prev_task;
-    print_task_started_message(ts_get_tag(i_current_task));
+    i_break = 0;
+    print_task_started_message(i_current_task);
     return OK;
 }
 
 result_t report_command() {
-    if (is_task(i_current_task)) {
+    if (!i_break && !i_no_task_yet) {
         wl_log_time_spent(&i_current_task_start_time, i_current_task);
     }
     print_summary(wl_get_summary());
@@ -127,10 +129,7 @@ result_t report_command() {
 }
 
 result_t stop_command() {
-    if (is_task(i_current_task)) {
-        wl_log_time_spent(&i_current_task_start_time, i_current_task);
-    }
-    print_summary(wl_get_summary());
+    report_command();
     i_stopped = 1;
     return OK;
 }
