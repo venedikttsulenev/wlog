@@ -11,6 +11,9 @@ static double wl_total_spent = 0;
 static double *wl_spent = NULL;
 static wl_tag_t *wl_tag = NULL;
 
+static int wl_last_task_index = -1;
+static double wl_last_task_spent = 0;
+
 void wl_init() {
     wl_spent = malloc(wl_capacity * sizeof(double));
     wl_tag = malloc(wl_capacity * sizeof(wl_tag_t));
@@ -47,15 +50,21 @@ double wl_log_time_spent(time_t *since, char *tag) {
     *since = current;
     wl_spent[index] += delta;
     wl_total_spent += delta;
+    if (index == wl_last_task_index) {
+        wl_last_task_spent += delta;
+    } else {
+        wl_last_task_index = index;
+        wl_last_task_spent = delta;
+    }
     return delta;
+}
+
+double wl_get_time_spent_last_task() {
+    return wl_last_task_spent;
 }
 
 wl_summary_t wl_get_summary() {
     return (wl_summary_t) {wl_size, wl_total_spent, wl_spent, wl_tag};
-}
-
-double wl_get_time_spent(char *tag) {
-    return wl_spent[wl_index(tag)];
 }
 
 void wl_free() {
