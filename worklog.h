@@ -14,6 +14,8 @@ typedef struct wl_summary {
     wl_tag_t *tag;
 } wl_summary_t;
 
+void wl_init();
+
 double wl_log_time_spent(time_t *since, char *tag);
 double wl_get_time_spent(char *tag);
 wl_summary_t wl_get_summary();

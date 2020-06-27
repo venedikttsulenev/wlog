@@ -5,7 +5,6 @@
 #define WL_DEFAULT_CAPACITY 128
 #define WL_CAPACITY_GROW_STEP 32
 
-static int wl_init_ran = 0;
 static int wl_capacity = WL_DEFAULT_CAPACITY;
 static int wl_size = 0;
 static double wl_total_spent = 0;
@@ -15,7 +14,6 @@ static wl_tag_t *wl_tag = NULL;
 void wl_init() {
     wl_spent = malloc(wl_capacity * sizeof(double));
     wl_tag = malloc(wl_capacity * sizeof(wl_tag_t));
-    wl_init_ran = 1;
 }
 
 void wl_grow() {
@@ -34,9 +32,6 @@ int wl_index(char *tag) {
 }
 
 double wl_log_time_spent(time_t *since, char *tag) {
-    if (!wl_init_ran) {
-        wl_init();
-    }
     int index = wl_index(tag);
     if (-1 == index) {
         if (wl_size == wl_capacity) {

@@ -36,13 +36,18 @@ char **get_completions(const char *text, int start, int end) {
     return rl_completion_matches(text, generate_completions);
 }
 
-void init_interactive_mode() {
+void i_init() {
     i_current_task_start_time = 0;
     i_break = 0;
     i_no_task_yet = 1;
     i_stopped = 0;
     rl_attempted_completion_function = get_completions;
     using_history();
+    wl_init();
+}
+
+void i_free() {
+    wl_free();
 }
 
 #define PROMPT "\033[2m>\033[0m "
@@ -50,7 +55,7 @@ void init_interactive_mode() {
 
 result_t run_interactive_mode() {
     char *input_str;
-    init_interactive_mode();
+    i_init();
     print_greeting();
     do {
         result_t result = OK;
@@ -70,7 +75,7 @@ result_t run_interactive_mode() {
         }
         handle(result);
     } while (!i_stopped);
-    wl_free();
+    i_free();
     return OK;
 }
 
@@ -150,10 +155,10 @@ result_t version_command() {
 }
 
 static command_t IMODE_COMMANDS[] = {
-        {task_command,     "task",     "t",   "Start work on task", "name"},
+        {task_command,     "task",     "t",   "Start work on task", "tag"},
         {break_command,    "break",    "br",  "Pause logging"},
         {continue_command, "continue", "co",  "Resume logging"},
-        {report_command,   "report",   "rep", "Print logged work summary"},
+        {report_command,   "report",   "rep", "Print logged time summary"},
         {stop_command,     "stop",     "st",  "Print summary and quit"},
         {quit_command,     "quit",     "q",   "Quit"},
         {help_command,     "help",     "h",   "Print help"},
