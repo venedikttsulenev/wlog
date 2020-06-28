@@ -88,7 +88,7 @@ result_t task_command() {
     if (strcmp(arg, i_current_task) != 0) {
         if (!i_break && !i_no_task_yet) {
             wl_log_time_spent(&i_current_task_start_time, i_current_task);
-            print_time_spent_message(wl_get_time_spent_last_task(), i_current_task);
+            print_time_spent_message(wl_get_time_spent(i_current_task), i_current_task);
         } else {
             i_no_task_yet = 0;
             i_break = 0;
@@ -106,7 +106,7 @@ result_t break_command() {
     }
 
     wl_log_time_spent(&i_current_task_start_time, i_current_task);
-    print_time_spent_message(wl_get_time_spent_last_task(), i_current_task);
+    print_time_spent_message(wl_get_time_spent(i_current_task), i_current_task);
     i_break = 1;
     return OK;
 }
