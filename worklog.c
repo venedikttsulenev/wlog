@@ -54,10 +54,6 @@ wl_summary_t wl_get_summary() {
     return (wl_summary_t) {wl_size, wl_total_spent, wl_spent, wl_tag};
 }
 
-double wl_get_time_spent(char *tag) {
-    return wl_spent[wl_index(tag)];
-}
-
 void wl_free() {
     if (wl_spent) {
         free(wl_spent);

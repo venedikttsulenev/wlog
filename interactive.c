@@ -13,6 +13,7 @@ static time_t i_current_task_start_time;
 static int i_break;
 static int i_no_task_yet;
 static int i_stopped;
+static double i_last_spent = 0;
 static command_t IMODE_COMMANDS[CMD_COUNT + 1];
 
 char *generate_completions(const char *text, int state) {
@@ -87,14 +88,15 @@ result_t task_command() {
 
     if (strcmp(arg, i_current_task) != 0) {
         if (!i_break && !i_no_task_yet) {
-            wl_log_time_spent(&i_current_task_start_time, i_current_task);
-            print_time_spent_message(wl_get_time_spent(i_current_task), i_current_task);
+            i_last_spent += wl_log_time_spent(&i_current_task_start_time, i_current_task);
+            print_time_spent_message(i_last_spent, i_current_task);
         } else {
             i_no_task_yet = 0;
             i_break = 0;
             i_current_task_start_time = time(NULL);
         }
         strncpy(i_current_task, arg, WL_MAX_TAG_LENGTH);
+        i_last_spent = 0;
         print_task_started_message(i_current_task);
     }
     return OK;
@@ -105,8 +107,8 @@ result_t break_command() {
         return error(ERR_LOGIC, "there's no task being worked on");
     }
 
-    wl_log_time_spent(&i_current_task_start_time, i_current_task);
-    print_time_spent_message(wl_get_time_spent(i_current_task), i_current_task);
+    i_last_spent += wl_log_time_spent(&i_current_task_start_time, i_current_task);
+    print_time_spent_message(i_last_spent, i_current_task);
     i_break = 1;
     return OK;
 }
@@ -121,13 +123,14 @@ result_t continue_command() {
 
     i_current_task_start_time = time(NULL);
     i_break = 0;
+    i_last_spent = 0;
     print_task_started_message(i_current_task);
     return OK;
 }
 
 result_t report_command() {
     if (!i_break && !i_no_task_yet) {
-        wl_log_time_spent(&i_current_task_start_time, i_current_task);
+        i_last_spent += wl_log_time_spent(&i_current_task_start_time, i_current_task);
     }
     print_summary(wl_get_summary());
     return OK;
