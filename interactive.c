@@ -6,7 +6,7 @@
 #include "print.h"
 #include "worklog.h"
 
-#define CMD_COUNT 8
+#define CMD_COUNT 9
 
 static wl_tag_t i_current_task;
 static time_t i_current_task_start_time;
@@ -136,6 +136,16 @@ result_t report_command() {
     return OK;
 }
 
+result_t clear_command() {
+    report_command();
+    i_current_task_start_time = 0;
+    i_break = 0;
+    i_no_task_yet = 1;
+    wl_clear();
+    print_worklog_cleared_message();
+    return OK;
+}
+
 result_t stop_command() {
     report_command();
     i_stopped = 1;
@@ -162,6 +172,7 @@ static command_t IMODE_COMMANDS[] = {
         {break_command,    "break",    "br",  "Pause logging"},
         {continue_command, "continue", "co",  "Resume logging"},
         {report_command,   "report",   "rep", "Print logged time summary"},
+        {clear_command,    "clear",    "cl",  "Print summary and reset worklog (clear all previous data)"},
         {stop_command,     "stop",     "st",  "Print summary and quit"},
         {quit_command,     "quit",     "q",   "Quit"},
         {help_command,     "help",     "h",   "Print help"},

@@ -128,3 +128,8 @@ void print_imode_help(command_t *commands) {
 void print_greeting() {
     puts("Welcome to wlog "VERSION"\nType 'help' or 'h' to see list of available commands");
 }
+
+void print_worklog_cleared_message() {
+    print_current_time();
+    puts("Worklog cleared.");
+}

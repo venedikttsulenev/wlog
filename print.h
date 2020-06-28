@@ -13,5 +13,6 @@ void print_version();
 void print_help(command_t *commands);
 void print_imode_help(command_t *commands);
 void print_greeting();
+void print_worklog_cleared_message();
 
 #endif //WLOG_PRINT_H

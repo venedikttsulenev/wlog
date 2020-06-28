@@ -18,6 +18,7 @@ void wl_init();
 
 double wl_log_time_spent(time_t *since, char *tag);
 wl_summary_t wl_get_summary();
+void wl_clear();
 
 void wl_free();
 

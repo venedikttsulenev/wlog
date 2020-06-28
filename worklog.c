@@ -54,6 +54,11 @@ wl_summary_t wl_get_summary() {
     return (wl_summary_t) {wl_size, wl_total_spent, wl_spent, wl_tag};
 }
 
+void wl_clear() {
+    wl_size = 0;
+    wl_total_spent = 0;
+}
+
 void wl_free() {
     if (wl_spent) {
         free(wl_spent);
