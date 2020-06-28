@@ -63,9 +63,9 @@ result_t run_interactive_mode() {
         if (input_str == NULL) {
             result = error(ERR_INPUT, NULL);
         } else {
+            add_history(input_str);
             char *tok = strtok(input_str, TOKEN_DELIMETERS);
             if (tok) {
-                add_history(input_str);
                 if (*tok != '#') {
                     command_t command = cmd_for_name(tok, IMODE_COMMANDS, NULL);
                     result = cmd_execute(command);

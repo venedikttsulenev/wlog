@@ -5,8 +5,6 @@ result_t unknown(const char *name) {
     return error(ERR_UNKNOWN_COMMAND, name);
 }
 
-#define unknown_command(name) (command_t) {unknown, name};
-
 command_t cmd_for_name(char *name, command_t *commands, command_t *default_command) {
     if (NULL == name)
         return *default_command;
@@ -16,7 +14,7 @@ command_t cmd_for_name(char *name, command_t *commands, command_t *default_comma
                 return *command;
         }
     }
-    return unknown_command(name);
+    return (command_t) {unknown, name};
 }
 
 int cmd_exists(command_t *command) {
