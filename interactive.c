@@ -5,8 +5,9 @@
 #include <readline/readline.h>
 #include "print.h"
 #include "worklog.h"
+#include "args.h"
 
-#define CMD_COUNT 9
+#define CMD_COUNT 10
 
 static wl_tag_t i_current_task;
 static time_t i_current_task_start_time;
@@ -16,7 +17,7 @@ static int i_stopped;
 static double i_last_spent = 0;
 static command_t IMODE_COMMANDS[CMD_COUNT + 1];
 
-char *generate_completions(const char *text, int state) {
+char *imode_generate_completions(const char *text, int state) {
     static int index = 0;
     if (state == 0) {
         index = 0;
@@ -32,31 +33,31 @@ char *generate_completions(const char *text, int state) {
     return NULL;
 }
 
-char **get_completions(const char *text, int start, int end) {
+char **imode_get_completions(const char *text, int start, int end) {
     rl_attempted_completion_over = 1;
-    return rl_completion_matches(text, generate_completions);
+    return rl_completion_matches(text, imode_generate_completions);
 }
 
-void i_init() {
+void imode_init() {
     i_current_task_start_time = 0;
     i_break = 0;
     i_no_task_yet = 1;
     i_stopped = 0;
-    rl_attempted_completion_function = get_completions;
+    rl_attempted_completion_function = imode_get_completions;
     using_history();
     wl_init();
 }
 
-void i_free() {
+void imode_free() {
     wl_free();
 }
 
 #define PROMPT "\033[2m>\033[0m "
 #define TOKEN_DELIMETERS " \t\n"
 
-result_t run_interactive_mode() {
+result_t imode_run() {
     char *input_str;
-    i_init();
+    imode_init();
     print_greeting();
     do {
         result_t result = OK;
@@ -74,13 +75,13 @@ result_t run_interactive_mode() {
             }
             free(input_str);
         }
-        handle(result);
+        err_handle(result);
     } while (!i_stopped);
-    i_free();
+    imode_free();
     return OK;
 }
 
-result_t task_command() {
+result_t imode_task() {
     char *arg = strtok(NULL, TOKEN_DELIMETERS);
     if (!arg) {
         return error(ERR_ARGUMENTS, "expected 1");
@@ -102,7 +103,7 @@ result_t task_command() {
     return OK;
 }
 
-result_t break_command() {
+result_t imode_break() {
     if (i_break || i_no_task_yet) {
         return error(ERR_LOGIC, "there's no task being worked on");
     }
@@ -113,7 +114,7 @@ result_t break_command() {
     return OK;
 }
 
-result_t continue_command() {
+result_t imode_continue() {
     if (i_no_task_yet) {
         return error(ERR_LOGIC, "there's no task to continue work on");
     }
@@ -128,7 +129,23 @@ result_t continue_command() {
     return OK;
 }
 
-result_t report_command() {
+result_t imode_log() {
+    char *spent_time = strtok(NULL, TOKEN_DELIMETERS);
+    char *tag = strtok(NULL, TOKEN_DELIMETERS);
+    if (!tag) {
+        return error(ERR_ARGUMENTS, "expected 2");
+    }
+
+    double spent_seconds;
+    error_t parse_error = args_time(spent_time, &spent_seconds);
+    if (!err_occured(parse_error)) {
+        wl_log(spent_seconds, tag);
+    }
+
+    return parse_error;
+}
+
+result_t imode_report() {
     if (!i_break && !i_no_task_yet) {
         i_last_spent += wl_log_time_spent(&i_current_task_start_time, i_current_task);
     }
@@ -136,8 +153,8 @@ result_t report_command() {
     return OK;
 }
 
-result_t clear_command() {
-    report_command();
+result_t imode_clear() {
+    imode_report();
     i_current_task_start_time = 0;
     i_break = 0;
     i_no_task_yet = 1;
@@ -146,36 +163,37 @@ result_t clear_command() {
     return OK;
 }
 
-result_t stop_command() {
-    report_command();
+result_t imode_stop() {
+    imode_report();
     i_stopped = 1;
     return OK;
 }
 
-result_t quit_command() {
+result_t imode_quit() {
     i_stopped = 1;
     return OK;
 }
 
-result_t help_command() {
+result_t imode_help() {
     print_imode_help(IMODE_COMMANDS);
     return OK;
 }
 
-result_t version_command() {
+result_t imode_version() {
     print_version();
     return OK;
 }
 
 static command_t IMODE_COMMANDS[] = {
-        {task_command,     "task",     "t",   "Start work on task", "tag"},
-        {break_command,    "break",    "br",  "Pause logging"},
-        {continue_command, "continue", "co",  "Resume logging"},
-        {report_command,   "report",   "rep", "Print logged time summary"},
-        {clear_command,    "clear",    "cl",  "Print summary and reset worklog (clear all previous data)"},
-        {stop_command,     "stop",     "st",  "Print summary and quit"},
-        {quit_command,     "quit",     "q",   "Quit"},
-        {help_command,     "help",     "h",   "Print help"},
-        {version_command,  "version",  "v",   "Print version"},
+        {imode_task,     "task",     "t",   "Start work on task", "task"},
+        {imode_break,    "break",    "br",  "Pause logging"},
+        {imode_continue, "continue", "co",  "Resume logging"},
+        {imode_log,      "log",      "l",   "Log time instantly", "time task"},
+        {imode_report,   "report",   "rep", "Print logged time summary"},
+        {imode_clear,    "clear",    "cl",  "Print summary and reset worklog (clear all previous data)"},
+        {imode_stop,     "stop",     "st",  "Print summary and quit"},
+        {imode_quit,     "quit",     "q",   "Quit"},
+        {imode_help,     "help",     "h",   "Print help"},
+        {imode_version,  "version",  "v",   "Print version"},
         {}
 };

@@ -3,6 +3,6 @@
 
 #include "command.h"
 
-result_t run_interactive_mode();
+result_t imode_run();
 
 #endif //WLOG_INTERACTIVE_H

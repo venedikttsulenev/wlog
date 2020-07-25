@@ -10,7 +10,7 @@ typedef struct command {
     char *name;
     char *shortname;
     char *description;
-    char *arg_description;
+    char *arg_list;
 } command_t;
 
 command_t cmd_for_name(char *name, command_t *commands, command_t *default_command);

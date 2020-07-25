@@ -3,6 +3,6 @@
 
 #include "command.h"
 
-command_t get_command(char *name);
+command_t usage_command(char *name);
 
 #endif //WLOG_USAGE_H

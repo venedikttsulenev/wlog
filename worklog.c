@@ -31,7 +31,7 @@ int wl_index(char *tag) {
     return -1;
 }
 
-double wl_log_time_spent(time_t *since, char *tag) {
+void wl_log(double seconds, char *tag) {
     int index = wl_index(tag);
     if (-1 == index) {
         if (wl_size == wl_capacity) {
@@ -42,11 +42,15 @@ double wl_log_time_spent(time_t *since, char *tag) {
         strncpy(wl_tag[index], tag, WL_MAX_TAG_LENGTH);
         wl_size += 1;
     }
+    wl_spent[index] += seconds;
+    wl_total_spent += seconds;
+}
+
+double wl_log_time_spent(time_t *since, char *tag) {
     time_t current = time(NULL);
     double delta = difftime(current, *since);
     *since = current;
-    wl_spent[index] += delta;
-    wl_total_spent += delta;
+    wl_log(delta, tag);
     return delta;
 }
 

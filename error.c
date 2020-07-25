@@ -10,9 +10,13 @@ static const char *ERR_MSG[] = {
         "Argument error"
 };
 
-int handle(error_t error) {
+int err_handle(error_t error) {
     if (error.code) {
         print_error(ERR_MSG[error.code], error.info);
     }
+    return error.code;
+}
+
+int err_occured(error_t error) {
     return error.code;
 }

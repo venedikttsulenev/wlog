@@ -83,6 +83,8 @@ void print_version() {
     puts("wlog "VERSION STYLE_FAINT", "RELEASE_DATE STYLE_NORMAL);
 }
 
+#define DESCRIPTION_OFFSET "20"
+
 void print_commands(command_t *commands) {
     puts(STYLE_BOLD"COMMANDS"STYLE_NORMAL);
     for (command_t *command = commands; cmd_exists(command); ++command) {
@@ -92,9 +94,9 @@ void print_commands(command_t *commands) {
             } else {
                 printf("    "STYLE_BOLD"%s "STYLE_NORMAL, command->name);
             }
-            if (command->arg_description) {
+            if (command->arg_list) {
                 fputs(STYLE_UNDERLINED, stdout);
-                for (char *c = command->arg_description; *c != '\0'; ++c) {
+                for (char *c = command->arg_list; *c != '\0'; ++c) {
                     if (*c == ' ') {
                         fputs(STYLE_NORMAL, stdout);
                         putchar(*c);
@@ -104,10 +106,8 @@ void print_commands(command_t *commands) {
                     }
                 }
                 fputs(STYLE_NORMAL, stdout);
-                printf("%*s - %s \n", 9 - (int) (strlen(command->name) + strlen(command->arg_description)), "", command->description);
-            } else {
-                printf("%*s - %s \n", 9 - (int) strlen(command->name), "", command->description);
             }
+            printf("\n\033[A\033["DESCRIPTION_OFFSET"C - %s\033[0m\n", command->description);
         }
     }
 }
