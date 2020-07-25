@@ -7,7 +7,7 @@
 #include "worklog.h"
 #include "args.h"
 
-#define CMD_COUNT 10
+#define CMD_COUNT 11
 
 static wl_tag_t i_current_task;
 static time_t i_current_task_start_time;
@@ -145,6 +145,22 @@ result_t imode_log() {
     return parse_error;
 }
 
+result_t imode_unlog() {
+    char *time_str = strtok(NULL, TOKEN_DELIMETERS);
+    char *tag = strtok(NULL, TOKEN_DELIMETERS);
+    if (!tag) {
+        return error(ERR_ARGUMENTS, "expected 2");
+    }
+
+    double seconds;
+    error_t parse_error = args_time(time_str, &seconds);
+    if (!err_occured(parse_error)) {
+        wl_unlog(seconds, tag);
+    }
+
+    return parse_error;
+}
+
 result_t imode_report() {
     if (!i_break && !i_no_task_yet) {
         i_last_spent += wl_log_time_spent(&i_current_task_start_time, i_current_task);
@@ -189,6 +205,7 @@ static command_t IMODE_COMMANDS[] = {
         {imode_break,    "break",    "br",  "Pause logging"},
         {imode_continue, "continue", "co",  "Resume logging"},
         {imode_log,      "log",      "l",   "Log time instantly", "time task"},
+        {imode_unlog,    "unlog",    "u",   "Unlog time", "time task"},
         {imode_report,   "report",   "rep", "Print logged time summary"},
         {imode_clear,    "clear",    "cl",  "Print summary and reset worklog (clear all previous data)"},
         {imode_stop,     "stop",     "st",  "Print summary and quit"},

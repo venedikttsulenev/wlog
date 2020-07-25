@@ -4,6 +4,7 @@
 
 #define WL_DEFAULT_CAPACITY 128
 #define WL_CAPACITY_GROW_STEP 32
+#define WL_NOT_FOUND -1
 
 static int wl_capacity = WL_DEFAULT_CAPACITY;
 static int wl_size = 0;
@@ -28,12 +29,12 @@ int wl_index(char *tag) {
             return i;
         }
     }
-    return -1;
+    return WL_NOT_FOUND;
 }
 
 void wl_log(double seconds, char *tag) {
     int index = wl_index(tag);
-    if (-1 == index) {
+    if (WL_NOT_FOUND == index) {
         if (wl_size == wl_capacity) {
             wl_grow();
         }
@@ -52,6 +53,15 @@ double wl_log_time_spent(time_t *since, char *tag) {
     *since = current;
     wl_log(delta, tag);
     return delta;
+}
+
+void wl_unlog(double seconds, char *tag) {
+    int index = wl_index(tag);
+    if (index != WL_NOT_FOUND) {
+        double delta = seconds < wl_spent[index] ? seconds : wl_spent[index];
+        wl_spent[index] -= delta;
+        wl_total_spent -= delta;
+    }
 }
 
 wl_summary_t wl_get_summary() {
