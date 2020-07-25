@@ -81,7 +81,7 @@ result_t imode_run() {
     return OK;
 }
 
-result_t imode_task() {
+result_t imode_timer() {
     char *arg = strtok(NULL, TOKEN_DELIMETERS);
     if (!arg) {
         return error(ERR_ARGUMENTS, "expected 1");
@@ -201,11 +201,11 @@ result_t imode_version() {
 }
 
 static command_t IMODE_COMMANDS[] = {
-        {imode_task,     "task",     "t",   "Start work on task", "task"},
+        {imode_timer,    "timer",    "t",   "Start timer for task", "task"},
         {imode_break,    "break",    "br",  "Pause logging"},
         {imode_continue, "continue", "co",  "Resume logging"},
         {imode_log,      "log",      "l",   "Log time instantly", "time task"},
-        {imode_unlog,    "unlog",    "u",   "Unlog time", "time task"},
+        {imode_unlog,    "unlog",    "u",   "Unlog time",         "time task"},
         {imode_report,   "report",   "rep", "Print logged time summary"},
         {imode_clear,    "clear",    "cl",  "Print summary and reset worklog (clear all previous data)"},
         {imode_stop,     "stop",     "st",  "Print summary and quit"},
