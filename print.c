@@ -14,61 +14,92 @@
 #define COLOR_YELLOW "\033[38;5;94m"
 #define COLOR_GREEN "\033[38;5;22m"
 
-void print_current_time() {
+#define BUFFER_SIZE 16
+
+char *get_buffer() {
+    static char buffer[BUFFER_SIZE][256]; // BUFFER_SIZE strings of length 256
+    static int free_buffer_index = 0;
+
+    char *ret = buffer[free_buffer_index++];
+    if (free_buffer_index >= BUFFER_SIZE) {
+        free_buffer_index = 0;
+    }
+    return ret;
+}
+
+char *current_time_str() {
+    char *str = get_buffer();
     time_t t = time(NULL);
     const struct tm *tm = localtime(&t);
-    char str[6];
     strftime(str, 6, "%H:%M", tm);
-    printf(COLOR_GREY"%s "STYLE_NORMAL, str);
+    char *colored_str = get_buffer();
+    sprintf(colored_str, COLOR_GREY"%s"STYLE_NORMAL, str);
+    return colored_str;
 }
 
-void print_timer_started_message(char *task) {
-    print_current_time();
-    printf("Started working on "COLOR_GREEN"%s\n"STYLE_NORMAL, task);
+char *format_task(const char *task) {
+    char *str = get_buffer();
+    sprintf(str, COLOR_GREEN"%s"STYLE_NORMAL, task);
+    return str;
 }
 
-void print_time_interval(double seconds) {
+char *format_time_interval(double seconds) {
+    char *str = get_buffer();
     long sec = lrint(round(seconds));
     long min = sec / 60L;
     long hour = min / 60L;
     if (hour > 0L) {
         min -= 60L * hour;
-        printf(COLOR_YELLOW"%ldh %ldm"STYLE_NORMAL, hour, min);
+        sprintf(str, COLOR_YELLOW"%ldh %ldm"STYLE_NORMAL, hour, min);
     } else {
-        printf(COLOR_YELLOW"%ldm"STYLE_NORMAL, min);
+        sprintf(str, COLOR_YELLOW"%ldm"STYLE_NORMAL, min);
     }
+    return str;
+}
+
+void print_timer_started_message(char *task) {
+    printf("%s Started working on %s\n", current_time_str(), format_task(task));
+}
+
+void print_timer_resumed_message(char *task) {
+    printf("%s Resumed working on %s\n", current_time_str(), format_task(task));
 }
 
 void print_time_spent_message(double seconds, char *task) {
-    print_current_time();
-    print_time_interval(seconds);
-    printf(" spent working on "COLOR_GREEN"%s\n"STYLE_NORMAL, task);
+    printf("%s %s spent working on %s\n", current_time_str(), format_time_interval(seconds), format_task(task));
 }
 
 void print_summary(wl_summary_t summary) {
-    print_current_time();
+    printf("%s ", current_time_str());
     if (summary.size) {
-        fputs("Time spent: ", stdout);
-        print_time_interval(summary.total_spent);
-        putchar('\n');
+        printf("Time spent: %s\n", format_time_interval(summary.total_spent));
         if (summary.size > 1) {
             int max_taskname_len = 0;
             for (int t = 0; t < summary.size; ++t) {
-                int len = (int) strlen(summary.task[t]);
+                int len = (int) strlen(format_task(summary.task[t]));
                 if (len > max_taskname_len) {
                     max_taskname_len = len;
                 }
             }
             for (int t = 0; t < summary.size; ++t) {
-                print_current_time();
-                printf(COLOR_GREEN"%*s"STYLE_NORMAL": ", max_taskname_len, summary.task[t]);
-                print_time_interval(summary.spent[t]);
-                putchar('\n');
+                printf("%s %*s: %s\n", current_time_str(), max_taskname_len, format_task(summary.task[t]), format_time_interval(summary.spent[t]));
             }
         }
     } else {
         puts("Nothing yet");
     }
+}
+
+void print_worklog_cleared_message() {
+    printf("%s Worklog cleared\n", current_time_str());
+}
+
+void print_logged_time_message(const char *task, double seconds) {
+    printf("%s Logged %s to %s", current_time_str(), format_time_interval(seconds), format_task(task));
+}
+
+void print_unlogged_time_message(const char *task, double seconds) {
+    printf("%s Unlogged %s from %s", current_time_str(), format_time_interval(seconds), format_task(task));
 }
 
 void print_error(const char *message, const char *info) {
@@ -127,9 +158,4 @@ void print_imode_help(command_t *commands) {
 
 void print_greeting() {
     puts("Welcome to wlog "VERSION"\nType 'help' or 'h' to see list of available commands");
-}
-
-void print_worklog_cleared_message() {
-    print_current_time();
-    puts("Worklog cleared.");
 }

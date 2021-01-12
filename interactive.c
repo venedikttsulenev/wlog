@@ -120,7 +120,7 @@ result_t imode_continue() {
     i_current_task_start_time = time(NULL);
     i_break = 0;
     i_last_spent = 0;
-    print_timer_started_message(i_current_task);
+    print_timer_resumed_message(i_current_task);
     return OK;
 }
 
@@ -130,6 +130,7 @@ result_t imode_log() {
     if (!err_occured(result)) {
         wl_log(args.time_seconds, args.task);
     }
+    print_logged_time_message(args.task, args.time_seconds);
 
     return result;
 }
@@ -140,6 +141,7 @@ result_t imode_unlog() {
     if (!err_occured(result)) {
         wl_unlog(args.time_seconds, args.task);
     }
+    print_unlogged_time_message(args.task, args.time_seconds);
 
     return result;
 }
