@@ -1,6 +1,5 @@
 #include "error.h"
 #include "print.h"
-#include <stdio.h>
 
 static const char *ERR_MSG[] = {
         NULL,

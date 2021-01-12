@@ -22,9 +22,9 @@ void print_current_time() {
     printf(COLOR_GREY"%s "STYLE_NORMAL, str);
 }
 
-void print_task_started_message(char *task_tag) {
+void print_timer_started_message(char *task) {
     print_current_time();
-    printf("Started working on "COLOR_GREEN"%s\n"STYLE_NORMAL, task_tag);
+    printf("Started working on "COLOR_GREEN"%s\n"STYLE_NORMAL, task);
 }
 
 void print_time_interval(double seconds) {
@@ -39,10 +39,10 @@ void print_time_interval(double seconds) {
     }
 }
 
-void print_time_spent_message(double seconds, char *task_tag) {
+void print_time_spent_message(double seconds, char *task) {
     print_current_time();
     print_time_interval(seconds);
-    printf(" spent working on "COLOR_GREEN"%s\n"STYLE_NORMAL, task_tag);
+    printf(" spent working on "COLOR_GREEN"%s\n"STYLE_NORMAL, task);
 }
 
 void print_summary(wl_summary_t summary) {
@@ -52,16 +52,16 @@ void print_summary(wl_summary_t summary) {
         print_time_interval(summary.total_spent);
         putchar('\n');
         if (summary.size > 1) {
-            int max_tag_len = 0;
+            int max_taskname_len = 0;
             for (int t = 0; t < summary.size; ++t) {
-                int len = (int) strlen(summary.tag[t]);
-                if (len > max_tag_len) {
-                    max_tag_len = len;
+                int len = (int) strlen(summary.task[t]);
+                if (len > max_taskname_len) {
+                    max_taskname_len = len;
                 }
             }
             for (int t = 0; t < summary.size; ++t) {
                 print_current_time();
-                printf(COLOR_GREEN"%*s"STYLE_NORMAL": ", max_tag_len, summary.tag[t]);
+                printf(COLOR_GREEN"%*s"STYLE_NORMAL": ", max_taskname_len, summary.task[t]);
                 print_time_interval(summary.spent[t]);
                 putchar('\n');
             }

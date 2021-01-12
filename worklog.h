@@ -3,23 +3,27 @@
 
 #include <time.h>
 
-#define WL_MAX_TAG_LENGTH 32
+#define WL_MAX_TASK_STR_LENGTH 32
 
-typedef char wl_tag_t[WL_MAX_TAG_LENGTH];
+typedef char wl_task_t[WL_MAX_TASK_STR_LENGTH];
 
 typedef struct wl_summary {
     int size;
     double total_spent;
     double *spent;
-    wl_tag_t *tag;
+    wl_task_t *task;
 } wl_summary_t;
 
 void wl_init();
 
-void wl_log(double seconds, char *tag);
-double wl_log_time_spent(time_t *since, char *tag);
-void wl_unlog(double seconds, char *tag);
+void wl_log(double seconds, const char *task);
+
+double wl_log_since(time_t *since, const char *task);
+
+void wl_unlog(double seconds, const char *task);
+
 wl_summary_t wl_get_summary();
+
 void wl_clear();
 
 void wl_free();
