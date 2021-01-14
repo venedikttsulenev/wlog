@@ -77,27 +77,6 @@ result_t imode_run() {
     return OK;
 }
 
-result_t imode_timer() {
-    args_t args;
-    result_t result = args_task(&args);
-    if (!err_occured(result)) {
-        if (strcmp(args.task, i_current_task) != 0) {
-            if (!i_break && !i_no_task_yet) {
-                i_last_spent += wl_log_since(&i_current_task_start_time, i_current_task);
-                print_time_spent_message(i_last_spent, i_current_task);
-            } else {
-                i_no_task_yet = 0;
-                i_break = 0;
-                i_current_task_start_time = time(NULL);
-            }
-            strncpy(i_current_task, args.task, WL_MAX_TASK_STR_LENGTH);
-            i_last_spent = 0;
-            print_timer_started_message(i_current_task);
-        }
-    }
-    return result;
-}
-
 result_t imode_break() {
     if (i_break || i_no_task_yet) {
         return error(ERR_LOGIC, "there's no task being worked on");
@@ -132,6 +111,30 @@ result_t imode_log() {
     }
     print_logged_time_message(args.task, args.time_seconds);
 
+    return result;
+}
+
+result_t imode_timer() {
+    args_t args;
+    result_t result = args_task(&args);
+    if (!err_occured(result)) {
+        if (strcmp(args.task, i_current_task) == 0) {
+            return imode_continue();
+        }
+        else {
+            if (!i_break && !i_no_task_yet) {
+                i_last_spent += wl_log_since(&i_current_task_start_time, i_current_task);
+                print_time_spent_message(i_last_spent, i_current_task);
+            } else {
+                i_no_task_yet = 0;
+                i_break = 0;
+                i_current_task_start_time = time(NULL);
+            }
+            strncpy(i_current_task, args.task, WL_MAX_TASK_STR_LENGTH);
+            i_last_spent = 0;
+            print_timer_started_message(i_current_task);
+        }
+    }
     return result;
 }
 
