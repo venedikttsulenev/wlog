@@ -108,9 +108,8 @@ result_t imode_log() {
     result_t result = args_time_and_task(&args);
     if (!err_occured(result)) {
         wl_log(args.time_seconds, args.task);
+        print_logged_time_message(args.task, args.time_seconds);
     }
-    print_logged_time_message(args.task, args.time_seconds);
-
     return result;
 }
 
@@ -143,9 +142,8 @@ result_t imode_unlog() {
     result_t result = args_time_and_task(&args);
     if (!err_occured(result)) {
         wl_unlog(args.time_seconds, args.task);
+        print_unlogged_time_message(args.task, args.time_seconds);
     }
-    print_unlogged_time_message(args.task, args.time_seconds);
-
     return result;
 }
 

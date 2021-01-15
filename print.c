@@ -70,11 +70,12 @@ void print_time_spent_message(double seconds, char *task) {
 }
 
 void print_summary(wl_summary_t summary) {
+    static const char *total_time_spent_str = "Time spent";
     printf("%s ", current_time_str());
     if (summary.size) {
-        printf("Time spent: %s\n", format_time_interval(summary.total_spent));
+        printf("%s: %s\n", total_time_spent_str, format_time_interval(summary.total_spent));
         if (summary.size > 1) {
-            int max_taskname_len = 0;
+            int max_taskname_len = (int) strlen(total_time_spent_str);
             for (int t = 0; t < summary.size; ++t) {
                 int len = (int) strlen(format_task(summary.task[t]));
                 if (len > max_taskname_len) {
@@ -95,11 +96,11 @@ void print_worklog_cleared_message() {
 }
 
 void print_logged_time_message(const char *task, double seconds) {
-    printf("%s Logged %s to %s", current_time_str(), format_time_interval(seconds), format_task(task));
+    printf("%s Logged %s to %s\n", current_time_str(), format_time_interval(seconds), format_task(task));
 }
 
 void print_unlogged_time_message(const char *task, double seconds) {
-    printf("%s Unlogged %s from %s", current_time_str(), format_time_interval(seconds), format_task(task));
+    printf("%s Unlogged %s from %s\n", current_time_str(), format_time_interval(seconds), format_task(task));
 }
 
 void print_error(const char *message, const char *info) {
