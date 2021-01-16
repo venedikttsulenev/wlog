@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
+#include "str.h"
 #include "version.h"
 
 #define STYLE_NORMAL "\033[0m"
@@ -14,37 +15,22 @@
 #define COLOR_YELLOW "\033[38;5;94m"
 #define COLOR_GREEN "\033[38;5;22m"
 
-#define BUFFER_SIZE 16
-
-char *get_buffer() {
-    static char buffer[BUFFER_SIZE][256]; // BUFFER_SIZE strings of length 256
-    static int free_buffer_index = 0;
-
-    char *ret = buffer[free_buffer_index++];
-    if (free_buffer_index >= BUFFER_SIZE) {
-        free_buffer_index = 0;
-    }
-    return ret;
-}
-
 char *current_time_str() {
-    char *str = get_buffer();
+    char *str = new_str();
     time_t t = time(NULL);
     const struct tm *tm = localtime(&t);
-    strftime(str, 6, "%H:%M", tm);
-    char *colored_str = get_buffer();
-    sprintf(colored_str, COLOR_GREY"%s"STYLE_NORMAL, str);
-    return colored_str;
+    strftime(str, strlen(COLOR_GREY) + 6 + strlen(STYLE_NORMAL), COLOR_GREY"%H:%M"STYLE_NORMAL, tm);
+    return str;
 }
 
 char *format_task(const char *task) {
-    char *str = get_buffer();
+    char *str = new_str();
     sprintf(str, COLOR_GREEN"%s"STYLE_NORMAL, task);
     return str;
 }
 
 char *format_time_interval(double seconds) {
-    char *str = get_buffer();
+    char *str = new_str();
     long sec = lrint(round(seconds));
     long min = sec / 60L;
     long hour = min / 60L;

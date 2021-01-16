@@ -5,6 +5,7 @@
 #include "print.h"
 #include "worklog.h"
 #include "args.h"
+#include "str.h"
 
 #define CMD_COUNT 11
 
@@ -141,8 +142,11 @@ result_t imode_unlog() {
     args_t args;
     result_t result = args_time_and_task(&args);
     if (!err_occured(result)) {
-        wl_unlog(args.time_seconds, args.task);
-        print_unlogged_time_message(args.task, args.time_seconds);
+        if (wl_unlog(args.time_seconds, args.task)) {
+            print_unlogged_time_message(args.task, args.time_seconds);
+        } else {
+            result = error(ERR_LOGIC, format_str("There's no task '%s'", args.task));
+        }
     }
     return result;
 }

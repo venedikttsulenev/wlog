@@ -55,13 +55,15 @@ double wl_log_since(time_t *since, const char *task) {
     return delta;
 }
 
-void wl_unlog(double seconds, const char *task) {
+int wl_unlog(double seconds, const char *task) {
     int index = wl_task_index(task);
-    if (index != WL_NOT_FOUND) {
-        double delta = seconds < wl_spent[index] ? seconds : wl_spent[index];
-        wl_spent[index] -= delta;
-        wl_total_spent -= delta;
+    if (index == WL_NOT_FOUND) {
+        return 0;
     }
+    double delta = seconds < wl_spent[index] ? seconds : wl_spent[index];
+    wl_spent[index] -= delta;
+    wl_total_spent -= delta;
+    return 1;
 }
 
 wl_summary_t wl_get_summary() {

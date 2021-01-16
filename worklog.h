@@ -20,7 +20,7 @@ void wl_log(double seconds, const char *task);
 
 double wl_log_since(time_t *since, const char *task);
 
-void wl_unlog(double seconds, const char *task);
+int wl_unlog(double seconds, const char *task);
 
 wl_summary_t wl_get_summary();
 
