@@ -1,7 +1,7 @@
 #ifndef WLOG_COMMAND_H
 #define WLOG_COMMAND_H
 
-#include "error.h"
+#include "../util/error.h"
 
 typedef error_t result_t;
 

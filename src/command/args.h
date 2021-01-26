@@ -1,4 +1,4 @@
-#include "error.h"
+#include "../util/error.h"
 
 #ifndef WLOG_ARGS_H
 #define WLOG_ARGS_H

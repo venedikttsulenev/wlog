@@ -1,8 +1,8 @@
 #ifndef WLOG_PRINT_H
 #define WLOG_PRINT_H
 
-#include "worklog.h"
-#include "command.h"
+#include "../worklog/worklog.h"
+#include "../command/command.h"
 
 void print_timer_started_message(char *task);
 

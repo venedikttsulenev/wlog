@@ -2,10 +2,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include <readline/readline.h>
-#include "print.h"
-#include "worklog.h"
+#include "../util/print.h"
 #include "args.h"
-#include "str.h"
+#include "../util/str.h"
 
 #define CMD_COUNT 11
 

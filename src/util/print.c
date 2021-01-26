@@ -3,7 +3,7 @@
 #include <math.h>
 #include <string.h>
 #include "str.h"
-#include "version.h"
+#include "../version.h"
 
 #define STYLE_NORMAL "\033[0m"
 #define STYLE_BOLD "\033[1m"
