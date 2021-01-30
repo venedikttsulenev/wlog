@@ -1,6 +1,7 @@
 #include "args.h"
 #include <stdlib.h>
 #include <string.h>
+#include "../util/str.h"
 
 static const char *wrong_time_format_message = "wrong time format";
 
@@ -34,10 +35,26 @@ void args_time(char *time_str, double *dest) {
     }
 }
 
+char *invalid_task_character(char* task) {
+    for (char *c = task; *c != '\0'; ++c) {
+        if (!strchr("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-/\\:.", *c)) {
+            return c;
+        }
+    }
+    return NULL;
+}
+
 void args_task(args_t *args) {
     args->task = strtok(NULL, TOKEN_DELIMETERS);
     if (!args->task) {
         err_set(ERR_ARGUMENTS, "expected task argument");
+    } else if (strlen(args->task) >= 31) {
+        err_set(ERR_ARGUMENTS, "31 characters maximum allowed for task name");
+    } else {
+        char *c = invalid_task_character(args->task);
+        if (c) {
+            err_set(ERR_ARGUMENTS, format_str("invalid task name character at position %d", c - args->task + 1));
+        }
     }
 }
 

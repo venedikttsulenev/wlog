@@ -6,7 +6,7 @@
 #define TOKEN_DELIMETERS " \t\n"
 
 typedef struct {
-    const char *task;
+    char *task;
     double time_seconds;
 } args_t;
 
