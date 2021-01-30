@@ -144,5 +144,5 @@ void print_imode_help(command_t *commands) {
 }
 
 void print_greeting() {
-    puts("Welcome to wlog "VERSION"\nType 'help' or 'h' to see list of available commands");
+    puts("Welcome to "STYLE_BOLD"wlog"STYLE_NORMAL"\nType 'help' or 'h' to see list of available commands");
 }
