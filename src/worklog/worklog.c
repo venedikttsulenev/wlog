@@ -91,6 +91,15 @@ double wl_get_time_spent(const char *task) {
     return index != WL_NOT_FOUND ? wl_spent[index] : 0;
 }
 
+int wl_delete_task(const char *task) {
+    int index = wl_task_index(task);
+    if (index == WL_NOT_FOUND) {
+        return 0;
+    }
+    wl_delete(index);
+    return 1;
+}
+
 void wl_clear() {
     wl_size = 0;
     wl_total_spent = 0;

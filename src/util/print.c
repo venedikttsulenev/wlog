@@ -14,6 +14,7 @@
 #define COLOR_GREY "\033[38;5;241m"
 #define COLOR_YELLOW "\033[38;5;94m"
 #define COLOR_GREEN "\033[38;5;22m"
+#define COLOR_BLUE "\033[38;5;19m"
 
 const int TASK_COLOR_COMBINATION_LEN = strlen(COLOR_GREEN STYLE_NORMAL);
 
@@ -65,7 +66,7 @@ void print_summary(wl_summary_t summary) {
     static const char *total_str = "Total";
     const int total_str_len = (int) strlen(total_str);
     if (summary.size) {
-        printf("%s Time spent:\n", current_time_str());
+        printf("%s Time logged:\n", current_time_str());
         int max_task_len = 0;
         for (int t = 0; t < summary.size; ++t) {
             int len = (int) strlen(summary.task[t]);
@@ -85,7 +86,7 @@ void print_summary(wl_summary_t summary) {
                 format_len, total_str,
                 format_time_interval(summary.total_spent));
     } else {
-        puts("Nothing yet");
+        printf("%s Nothing yet\n", current_time_str());
     }
 }
 
@@ -151,10 +152,17 @@ void print_help(command_t *commands) {
 
 void print_imode_help(command_t *commands) {
     print_commands(commands);
+    puts(STYLE_BOLD"\nARGUMENTS"STYLE_NORMAL);
+    puts("    "STYLE_UNDERLINED"Time"STYLE_NORMAL" is passed like "COLOR_BLUE"*"STYLE_NORMAL", "COLOR_BLUE"*h*m"STYLE_NORMAL", "COLOR_BLUE"*h"STYLE_NORMAL", or "COLOR_BLUE"*m"STYLE_NORMAL", where * is a non-negative number");
+    puts("    "STYLE_UNDERLINED"Task"STYLE_NORMAL" is a string containing max 31 characters from following list: "COLOR_BLUE"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-/\\:."STYLE_NORMAL);
     puts("\nTo leave a "STYLE_BOLD"comment"STYLE_NORMAL" use '#' symbol:\n"
          "  > # Comment\n");
 }
 
 void print_greeting() {
     puts("Welcome to "STYLE_BOLD"wlog"STYLE_NORMAL"\nType 'help' or 'h' to see list of available commands");
+}
+
+void print_task_deleted_message(const char *task) {
+    printf("Deleted task %s\n", format_task(task));
 }
