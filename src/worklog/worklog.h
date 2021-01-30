@@ -24,6 +24,8 @@ int wl_unlog(double seconds, const char *task);
 
 wl_summary_t wl_get_summary();
 
+double wl_get_time_spent(const char *task);
+
 void wl_clear();
 
 void wl_free();

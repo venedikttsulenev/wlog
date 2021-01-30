@@ -8,7 +8,7 @@ void print_timer_started_message(char *task);
 
 void print_timer_resumed_message(char *task);
 
-void print_time_spent_message(double seconds, char *task);
+void print_time_spent_message(double seconds, double total_seconds, char *task);
 
 void print_summary(wl_summary_t summary);
 

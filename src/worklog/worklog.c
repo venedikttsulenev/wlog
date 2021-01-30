@@ -86,6 +86,11 @@ wl_summary_t wl_get_summary() {
     return (wl_summary_t) {wl_size, wl_total_spent, wl_spent, wl_task};
 }
 
+double wl_get_time_spent(const char *task) {
+    int index = wl_task_index(task);
+    return index != WL_NOT_FOUND ? wl_spent[index] : 0;
+}
+
 void wl_clear() {
     wl_size = 0;
     wl_total_spent = 0;

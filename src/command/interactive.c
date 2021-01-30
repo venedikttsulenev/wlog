@@ -82,7 +82,7 @@ void imode_break() {
     }
 
     i_last_spent += wl_log_since(&i_current_task_start_time, i_current_task);
-    print_time_spent_message(i_last_spent, i_current_task);
+    print_time_spent_message(i_last_spent, wl_get_time_spent(i_current_task), i_current_task);
     i_break = 1;
 }
 
@@ -120,7 +120,7 @@ void imode_timer() {
     } else {
         if (!i_break && !i_no_task_yet) {
             i_last_spent += wl_log_since(&i_current_task_start_time, i_current_task);
-            print_time_spent_message(i_last_spent, i_current_task);
+            print_time_spent_message(i_last_spent, wl_get_time_spent(i_current_task), i_current_task);
         } else {
             i_no_task_yet = 0;
             i_break = 0;

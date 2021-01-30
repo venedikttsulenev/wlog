@@ -51,8 +51,12 @@ void print_timer_resumed_message(char *task) {
     printf("%s Resumed working on %s\n", current_time_str(), format_task(task));
 }
 
-void print_time_spent_message(double seconds, char *task) {
-    printf("%s %s spent working on %s\n", current_time_str(), format_time_interval(seconds), format_task(task));
+void print_time_spent_message(double seconds, double total_seconds, char *task) {
+    printf("%s %s spent working on %s (%s total)\n",
+            current_time_str(),
+            format_time_interval(seconds),
+            format_task(task),
+            format_time_interval(total_seconds));
 }
 
 void print_summary(wl_summary_t summary) {
@@ -69,7 +73,10 @@ void print_summary(wl_summary_t summary) {
                 }
             }
             for (int t = 0; t < summary.size; ++t) {
-                printf("%s %*s: %s\n", current_time_str(), max_taskname_len, format_task(summary.task[t]), format_time_interval(summary.spent[t]));
+                printf("%s %*s: %s\n",
+                        current_time_str(),
+                        max_taskname_len, format_task(summary.task[t]),
+                        format_time_interval(summary.spent[t]));
             }
         }
     } else {
