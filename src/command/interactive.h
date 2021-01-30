@@ -3,6 +3,6 @@
 
 #include "command.h"
 
-result_t imode_run();
+void imode_run();
 
 #endif //WLOG_INTERACTIVE_H

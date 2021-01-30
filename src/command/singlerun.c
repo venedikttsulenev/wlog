@@ -4,18 +4,16 @@
 
 static command_t COMMANDS[];
 
-result_t singlerun_interactive_mode() {
-    return imode_run();
+void singlerun_interactive_mode() {
+    imode_run();
 }
 
-result_t singlerun_help() {
+void singlerun_help() {
     print_help(COMMANDS);
-    return OK;
 }
 
-result_t singlerun_version() {
+void singlerun_version() {
     print_version();
-    return OK;
 }
 
 static command_t COMMANDS[] = {

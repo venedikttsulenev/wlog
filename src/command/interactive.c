@@ -53,140 +53,128 @@ void imode_free() {
 
 #define PROMPT "\033[2m>\033[0m "
 
-result_t imode_run() {
+void imode_run() {
     char *input_str;
     imode_init();
     print_greeting();
     do {
-        result_t result = OK;
         input_str = readline(PROMPT);
         if (input_str == NULL) {
-            result = error(ERR_INPUT, NULL);
+            err_set(ERR_INPUT, NULL);
         } else {
             add_history(input_str);
             char *tok = strtok(input_str, TOKEN_DELIMETERS);
             if (tok && *tok != '#') {
                 command_t command = cmd_for_name(tok, IMODE_COMMANDS, NULL);
-                result = cmd_execute(command);
+                cmd_execute(command);
             }
             free(input_str);
         }
-        err_handle(result);
+        err_handle();
     } while (!i_stopped);
     imode_free();
-    return OK;
 }
 
-result_t imode_break() {
+void imode_break() {
     if (i_break || i_no_task_yet) {
-        return error(ERR_LOGIC, "there's no task being worked on");
+        err_set(ERR_LOGIC, "there's no task being worked on");
+        return;
     }
 
     i_last_spent += wl_log_since(&i_current_task_start_time, i_current_task);
     print_time_spent_message(i_last_spent, i_current_task);
     i_break = 1;
-    return OK;
 }
 
-result_t imode_continue() {
+void imode_continue() {
     if (i_no_task_yet) {
-        return error(ERR_LOGIC, "there's no task to continue work on");
+        err_set(ERR_LOGIC, "there's no task to continue work on");
+        return;
     }
     if (!i_break) {
-        return error(ERR_LOGIC, "there is already task being worked on");
+        err_set(ERR_LOGIC, "there is already task being worked on");
+        return;
     }
 
     i_current_task_start_time = time(NULL);
     i_break = 0;
     i_last_spent = 0;
     print_timer_resumed_message(i_current_task);
-    return OK;
 }
 
-result_t imode_log() {
+void imode_log() {
     args_t args;
-    result_t result = args_time_and_task(&args);
-    if (!err_occured(result)) {
+    args_time_and_task(&args);
+    if (!err_occured()) {
         wl_log(args.time_seconds, args.task);
         print_logged_time_message(args.task, args.time_seconds);
     }
-    return result;
 }
 
-result_t imode_timer() {
+void imode_timer() {
     args_t args;
-    result_t result = args_task(&args);
-    if (!err_occured(result)) {
-        if (strcmp(args.task, i_current_task) == 0) {
-            return imode_continue();
+    args_task(&args);
+    if (err_occured()) { return; }
+    if (strcmp(args.task, i_current_task) == 0) {
+        return imode_continue();
+    } else {
+        if (!i_break && !i_no_task_yet) {
+            i_last_spent += wl_log_since(&i_current_task_start_time, i_current_task);
+            print_time_spent_message(i_last_spent, i_current_task);
+        } else {
+            i_no_task_yet = 0;
+            i_break = 0;
+            i_current_task_start_time = time(NULL);
         }
-        else {
-            if (!i_break && !i_no_task_yet) {
-                i_last_spent += wl_log_since(&i_current_task_start_time, i_current_task);
-                print_time_spent_message(i_last_spent, i_current_task);
-            } else {
-                i_no_task_yet = 0;
-                i_break = 0;
-                i_current_task_start_time = time(NULL);
-            }
-            strncpy(i_current_task, args.task, WL_MAX_TASK_STR_LENGTH);
-            i_last_spent = 0;
-            print_timer_started_message(i_current_task);
-        }
+        strncpy(i_current_task, args.task, WL_MAX_TASK_STR_LENGTH);
+        i_last_spent = 0;
+        print_timer_started_message(i_current_task);
     }
-    return result;
 }
 
-result_t imode_unlog() {
+void imode_unlog() {
     args_t args;
-    result_t result = args_time_and_task(&args);
-    if (!err_occured(result)) {
+    args_time_and_task(&args);
+    if (!err_occured()) {
         if (wl_unlog(args.time_seconds, args.task)) {
             print_unlogged_time_message(args.task, args.time_seconds);
         } else {
-            result = error(ERR_LOGIC, format_str("There's no task '%s'", args.task));
+            err_set(ERR_LOGIC, format_str("There's no task '%s'", args.task));
         }
     }
-    return result;
 }
 
-result_t imode_report() {
+void imode_report() {
     if (!i_break && !i_no_task_yet) {
         i_last_spent += wl_log_since(&i_current_task_start_time, i_current_task);
     }
     print_summary(wl_get_summary());
-    return OK;
 }
 
-result_t imode_clear() {
+void imode_clear() {
     imode_report();
     i_current_task_start_time = 0;
     i_break = 0;
     i_no_task_yet = 1;
     wl_clear();
     print_worklog_cleared_message();
-    return OK;
 }
 
-result_t imode_stop() {
+void imode_stop() {
     imode_report();
     i_stopped = 1;
-    return OK;
 }
 
-result_t imode_quit() {
+void imode_quit() {
     i_stopped = 1;
-    return OK;
 }
 
-result_t imode_help() {
+void imode_help() {
     print_imode_help(IMODE_COMMANDS);
-    return OK;
 }
 
-result_t imode_version() {
+void imode_version() {
     print_version();
-    return OK;
 }
 
 static command_t IMODE_COMMANDS[] = {

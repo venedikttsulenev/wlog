@@ -8,11 +8,10 @@
 typedef struct {
     const char *task;
     double time_seconds;
-    error_t error;
 } args_t;
 
-error_t args_task(args_t *args);
+void args_task(args_t *args);
 
-error_t args_time_and_task(args_t *args);
+void args_time_and_task(args_t *args);
 
 #endif //WLOG_ARGS_H

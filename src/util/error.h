@@ -8,15 +8,13 @@ typedef struct error {
     const char *info;
 } error_t;
 
-#define error(code, info) (error_t) {code, info}
-#define OK (error_t) {0, NULL}
-
 #define ERR_UNKNOWN_COMMAND 1
 #define ERR_INPUT 2
 #define ERR_LOGIC 3
 #define ERR_ARGUMENTS 4
 
-int err_handle(error_t error);
-int err_occured(error_t error);
+void err_set(int code, const char *info);
+int err_occured();
+int err_handle();
 
 #endif //WLOG_ERROR_H
