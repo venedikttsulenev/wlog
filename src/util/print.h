@@ -28,4 +28,6 @@ void print_logged_time_message(const char *task, double seconds);
 
 void print_unlogged_time_message(const char *task, double seconds);
 
+void print_task_deleted_message(const char *task);
+
 #endif //WLOG_PRINT_H

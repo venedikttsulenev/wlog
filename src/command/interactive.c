@@ -6,7 +6,7 @@
 #include "args.h"
 #include "../util/str.h"
 
-#define CMD_COUNT 11
+#define CMD_COUNT 12
 
 static wl_task_t i_current_task;
 static time_t i_current_task_start_time;
@@ -144,6 +144,20 @@ void imode_unlog() {
     }
 }
 
+void imode_delete() {
+    args_t args;
+    args_task(&args);
+    if (err_occured()) {
+        return;
+    }
+
+    if (wl_delete_task(args.task)) {
+        print_task_deleted_message(args.task);
+    } else {
+        err_set(ERR_LOGIC, format_str("There's no task '%s'", args.task));
+    }
+}
+
 void imode_report() {
     if (!i_break && !i_no_task_yet) {
         i_last_spent += wl_log_since(&i_current_task_start_time, i_current_task);
@@ -183,8 +197,9 @@ static command_t IMODE_COMMANDS[] = {
         {imode_continue, "continue", "co",  "Resume timer"},
         {imode_log,      "log",      "l",   "Log time",             "task time"},
         {imode_unlog,    "unlog",    "u",   "Unlog time",           "task time"},
+        {imode_delete,   "delete",   "del", "Delete task log",      "task"},
         {imode_report,   "report",   "rep", "Print logged time summary"},
-        {imode_clear,    "clear",    "cl",  "Print summary and reset worklog (clear all previous data)"},
+        {imode_clear,    "clear",    "cl",  "Print summary and clear worklog"},
         {imode_stop,     "stop",     "st",  "Print summary and quit"},
         {imode_quit,     "quit",     "q",   "Quit"},
         {imode_help,     "help",     "h",   "Print help"},
