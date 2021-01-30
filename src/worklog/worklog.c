@@ -32,6 +32,10 @@ int wl_task_index(const char *task) {
     return WL_NOT_FOUND;
 }
 
+void wl_set_task(int index, const char* task) {
+    strncpy(wl_task[index], task, WL_MAX_TASK_STR_LENGTH);
+}
+
 void wl_log(double seconds, const char *task) {
     int index = wl_task_index(task);
     if (WL_NOT_FOUND == index) {
@@ -40,7 +44,7 @@ void wl_log(double seconds, const char *task) {
         }
         index = wl_size;
         wl_spent[index] = 0;
-        strncpy(wl_task[index], task, WL_MAX_TASK_STR_LENGTH);
+        wl_set_task(index, task);
         wl_size += 1;
     }
     wl_spent[index] += seconds;
@@ -55,14 +59,26 @@ double wl_log_since(time_t *since, const char *task) {
     return delta;
 }
 
+void wl_delete(int index) {
+    wl_total_spent -= wl_spent[index];
+    wl_size -= 1;
+    if (index != wl_size) {
+        wl_spent[index] = wl_spent[wl_size];
+        wl_set_task(index, wl_task[wl_size]);
+    }
+}
+
 int wl_unlog(double seconds, const char *task) {
     int index = wl_task_index(task);
     if (index == WL_NOT_FOUND) {
         return 0;
     }
-    double delta = seconds < wl_spent[index] ? seconds : wl_spent[index];
-    wl_spent[index] -= delta;
-    wl_total_spent -= delta;
+    if (seconds >= wl_spent[index]) {
+        wl_delete(index);
+    } else {
+        wl_spent[index] -= seconds;
+        wl_total_spent -= seconds;
+    }
     return 1;
 }
 
