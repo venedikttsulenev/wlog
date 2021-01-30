@@ -15,6 +15,8 @@
 #define COLOR_YELLOW "\033[38;5;94m"
 #define COLOR_GREEN "\033[38;5;22m"
 
+const int TASK_COLOR_COMBINATION_LEN = strlen(COLOR_GREEN STYLE_NORMAL);
+
 char *current_time_str() {
     char *str = new_str(strlen(COLOR_GREY STYLE_NORMAL) + 7);
     time_t t = time(NULL);
@@ -24,7 +26,7 @@ char *current_time_str() {
 }
 
 char *format_task(const char *task) {
-    char *str = new_str(strlen(COLOR_GREY STYLE_NORMAL) + strlen(task) + 1);
+    char *str = new_str( TASK_COLOR_COMBINATION_LEN + strlen(task) + 1);
     sprintf(str, COLOR_GREEN"%s"STYLE_NORMAL, task);
     return str;
 }
@@ -60,25 +62,28 @@ void print_time_spent_message(double seconds, double total_seconds, char *task) 
 }
 
 void print_summary(wl_summary_t summary) {
-    static const char *total_time_spent_str = "Time spent";
-    printf("%s ", current_time_str());
+    static const char *total_str = "Total";
+    const int total_str_len = (int) strlen(total_str);
     if (summary.size) {
-        printf("%s: %s\n", total_time_spent_str, format_time_interval(summary.total_spent));
-        if (summary.size > 1) {
-            int max_taskname_len = (int) strlen(total_time_spent_str);
-            for (int t = 0; t < summary.size; ++t) {
-                int len = (int) strlen(format_task(summary.task[t]));
-                if (len > max_taskname_len) {
-                    max_taskname_len = len;
-                }
-            }
-            for (int t = 0; t < summary.size; ++t) {
-                printf("%s %*s: %s\n",
-                        current_time_str(),
-                        max_taskname_len, format_task(summary.task[t]),
-                        format_time_interval(summary.spent[t]));
+        printf("%s Time spent:\n", current_time_str());
+        int max_task_len = 0;
+        for (int t = 0; t < summary.size; ++t) {
+            int len = (int) strlen(summary.task[t]);
+            if (len > max_task_len) {
+                max_task_len = len;
             }
         }
+        int format_len = (max_task_len > total_str_len) ? max_task_len : total_str_len;
+        for (int t = 0; t < summary.size; ++t) {
+            printf("%s %*s: %s\n",
+                   current_time_str(),
+                   format_len + TASK_COLOR_COMBINATION_LEN, format_task(summary.task[t]),
+                   format_time_interval(summary.spent[t]));
+        }
+        printf("%s %*s: %s\n",
+                current_time_str(),
+                format_len, total_str,
+                format_time_interval(summary.total_spent));
     } else {
         puts("Nothing yet");
     }
