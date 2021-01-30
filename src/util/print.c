@@ -16,7 +16,7 @@
 #define COLOR_GREEN "\033[38;5;22m"
 
 char *current_time_str() {
-    char *str = new_str();
+    char *str = new_str(strlen(COLOR_GREY STYLE_NORMAL) + 7);
     time_t t = time(NULL);
     const struct tm *tm = localtime(&t);
     strftime(str, strlen(COLOR_GREY) + 6 + strlen(STYLE_NORMAL), COLOR_GREY"%H:%M"STYLE_NORMAL, tm);
@@ -24,13 +24,13 @@ char *current_time_str() {
 }
 
 char *format_task(const char *task) {
-    char *str = new_str();
+    char *str = new_str(strlen(COLOR_GREY STYLE_NORMAL) + strlen(task) + 1);
     sprintf(str, COLOR_GREEN"%s"STYLE_NORMAL, task);
     return str;
 }
 
 char *format_time_interval(double seconds) {
-    char *str = new_str();
+    char *str = new_str(strlen(COLOR_YELLOW STYLE_NORMAL) + 42);
     long sec = lrint(round(seconds));
     long min = sec / 60L;
     long hour = min / 60L;
