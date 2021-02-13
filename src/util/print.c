@@ -114,7 +114,7 @@ void print_version() {
     puts("wlog "VERSION STYLE_FAINT", "RELEASE_DATE STYLE_NORMAL);
 }
 
-#define DESCRIPTION_OFFSET "20"
+#define DESCRIPTION_OFFSET "24"
 
 void print_commands(command_t *commands) {
     puts(STYLE_BOLD"COMMANDS"STYLE_NORMAL);
@@ -165,4 +165,8 @@ void print_greeting() {
 
 void print_task_deleted_message(const char *task) {
     printf("Deleted task %s\n", format_task(task));
+}
+
+void print_task_renamed_message(const char *oldname, const char *newname) {
+    printf("Renamed %s to %s\n", format_task(oldname), format_task(newname));
 }

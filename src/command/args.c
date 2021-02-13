@@ -1,11 +1,16 @@
 #include "args.h"
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 #include "../util/str.h"
 
 static const char *wrong_time_format_message = "wrong time format";
 
-void args_time(char *time_str, double *dest) {
+char *next_arg() {
+    return strtok(NULL, TOKEN_DELIMETERS);
+}
+
+void parse_time(double *dest, char *time_str) {
     char *endptr;
     long num1 = strtol(time_str, &endptr, 10);
     if (num1 <= 0) {
@@ -44,29 +49,53 @@ char *invalid_task_character(char* task) {
     return NULL;
 }
 
-void args_task(args_t *args) {
-    args->task = strtok(NULL, TOKEN_DELIMETERS);
-    if (!args->task) {
-        err_set(ERR_ARGUMENTS, "expected task argument");
-    } else if (strlen(args->task) >= 31) {
+void parse_task_name(char **dest, char *str) {
+    if (strlen(str) >= 31) {
         err_set(ERR_ARGUMENTS, "31 characters maximum allowed for task name");
     } else {
-        char *c = invalid_task_character(args->task);
+        char *c = invalid_task_character(str);
         if (c) {
-            err_set(ERR_ARGUMENTS, format_str("invalid task name character at position %d", c - args->task + 1));
+            err_set(ERR_ARGUMENTS, format_str("invalid task name character at position %d", c - str + 1));
         }
+    }
+    *dest = str;
+}
+
+const char *argname[] = {
+        "time",
+        "task",
+        "newname"
+};
+
+void parse_arg(args_t *args, int argument) {
+    char *arg_str = next_arg();
+    if (!arg_str) {
+        err_set(ERR_ARGUMENTS, format_str("Expected '%s' argument", argname[argument]));
+        return;
+    }
+    switch (argument) {
+        case ARG_TIME:
+            parse_time(&args->time_seconds, arg_str);
+            break;
+        case ARG_TASK:
+            parse_task_name(&args->task, arg_str);
+            break;
+        case ARG_NEWNAME:
+            parse_task_name(&args->newname, arg_str);
+            break;
+        default:
+            err_set(ERR_INTERNAL, "unknown argument type");
+            return;
     }
 }
 
-void args_time_and_task(args_t *args) {
-    args_task(args);
-    if (err_occured()) {
-        return;
+args_t args_get(int count, ...) {
+    args_t args = {NULL, NULL, -1};
+    va_list ap;
+    va_start(ap, count);
+    while (count--) {
+        parse_arg(&args, va_arg(ap, int));
     }
-    char *time_str = strtok(NULL, TOKEN_DELIMETERS);
-    if (!time_str) {
-        err_set(ERR_ARGUMENTS, "expected two arguments");
-    } else {
-        args_time(time_str, &args->time_seconds);
-    }
+    va_end(ap);
+    return args;
 }

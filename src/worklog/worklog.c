@@ -33,7 +33,7 @@ int wl_task_index(const char *task) {
 }
 
 void wl_set_task(int index, const char* task) {
-    strncpy(wl_task[index], task, WL_MAX_TASK_STR_LENGTH);
+    strcpy(wl_task[index], task);
 }
 
 void wl_log(double seconds, const char *task) {
@@ -89,6 +89,15 @@ wl_summary_t wl_get_summary() {
 double wl_get_time_spent(const char *task) {
     int index = wl_task_index(task);
     return index != WL_NOT_FOUND ? wl_spent[index] : 0;
+}
+
+int wl_rename_task(const char *task, const char *new_name) {
+    int index = wl_task_index(task);
+    if (index == WL_NOT_FOUND || wl_task_index(new_name) != WL_NOT_FOUND) {
+        return 0;
+    }
+    strcpy(wl_task[index], new_name);
+    return 1;
 }
 
 int wl_delete_task(const char *task) {

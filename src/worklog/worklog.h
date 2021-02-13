@@ -26,6 +26,8 @@ wl_summary_t wl_get_summary();
 
 double wl_get_time_spent(const char *task);
 
+int wl_rename_task(const char *task, const char *new_name);
+
 int wl_delete_task(const char *task);
 
 void wl_clear();

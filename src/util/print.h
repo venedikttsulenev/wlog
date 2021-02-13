@@ -30,4 +30,6 @@ void print_unlogged_time_message(const char *task, double seconds);
 
 void print_task_deleted_message(const char *task);
 
+void print_task_renamed_message(const char *oldname, const char *newname);
+
 #endif //WLOG_PRINT_H

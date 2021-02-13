@@ -6,7 +6,7 @@
 #include "args.h"
 #include "../util/str.h"
 
-#define CMD_COUNT 12
+#define CMD_COUNT 13
 
 static wl_task_t i_current_task;
 static time_t i_current_task_start_time;
@@ -51,7 +51,16 @@ void imode_free() {
     wl_free();
 }
 
+void err_task_not_found(const char *name) {
+    err_set(ERR_LOGIC, format_str("there's no task '%s'", name));
+}
+
 #define PROMPT "\033[2m>\033[0m "
+
+void imode_handle_error() {
+    err_print();
+    err_reset();
+}
 
 void imode_run() {
     char *input_str;
@@ -70,7 +79,7 @@ void imode_run() {
             }
             free(input_str);
         }
-        err_handle();
+        imode_handle_error();
     } while (!i_stopped);
     imode_free();
 }
@@ -103,8 +112,7 @@ void imode_continue() {
 }
 
 void imode_log() {
-    args_t args;
-    args_time_and_task(&args);
+    args_t args = args_get(2, ARG_TASK, ARG_TIME);
     if (!err_occured()) {
         wl_log(args.time_seconds, args.task);
         print_logged_time_message(args.task, args.time_seconds);
@@ -112,8 +120,7 @@ void imode_log() {
 }
 
 void imode_timer() {
-    args_t args;
-    args_task(&args);
+    args_t args = args_get(1, ARG_TASK);
     if (err_occured()) { return; }
     if (strcmp(args.task, i_current_task) == 0) {
         return imode_continue();
@@ -126,27 +133,42 @@ void imode_timer() {
             i_break = 0;
             i_current_task_start_time = time(NULL);
         }
-        strncpy(i_current_task, args.task, WL_MAX_TASK_STR_LENGTH);
+        strcpy(i_current_task, args.task);
         i_last_spent = 0;
         print_timer_started_message(i_current_task);
     }
 }
 
 void imode_unlog() {
-    args_t args;
-    args_time_and_task(&args);
+    args_t args = args_get(2, ARG_TASK, ARG_TIME);
     if (!err_occured()) {
         if (wl_unlog(args.time_seconds, args.task)) {
             print_unlogged_time_message(args.task, args.time_seconds);
         } else {
-            err_set(ERR_LOGIC, format_str("There's no task '%s'", args.task));
+            err_task_not_found(args.task);
         }
     }
 }
 
+void imode_rename() {
+    args_t args = args_get(2, ARG_TASK, ARG_NEWNAME);
+    if (err_occured()) {
+        return;
+    }
+    int cur_task_renamed = 0;
+    if (strcmp(i_current_task, args.task) == 0) {
+        strcpy(i_current_task, args.newname);
+        cur_task_renamed = 1;
+    }
+    if (wl_rename_task(args.task, args.newname) || cur_task_renamed) {
+        print_task_renamed_message(args.task, args.newname);
+    } else {
+        err_set(ERR_LOGIC, format_str("can't rename '%s' to '%s': there's no task '%s' or task '%s' already exists.", args.task, args.newname, args.task, args.newname));
+    }
+}
+
 void imode_delete() {
-    args_t args;
-    args_task(&args);
+    args_t args = args_get(1, ARG_TASK);
     if (err_occured()) {
         return;
     }
@@ -154,7 +176,7 @@ void imode_delete() {
     if (wl_delete_task(args.task)) {
         print_task_deleted_message(args.task);
     } else {
-        err_set(ERR_LOGIC, format_str("There's no task '%s'", args.task));
+        err_task_not_found(args.task);
     }
 }
 
@@ -197,6 +219,7 @@ static command_t IMODE_COMMANDS[] = {
         {imode_continue, "continue", "co",  "Resume timer"},
         {imode_log,      "log",      "l",   "Log time",             "task time"},
         {imode_unlog,    "unlog",    "u",   "Unlog time",           "task time"},
+        {imode_rename,   "rename",   "rn",  "Rename task",          "task newname"},
         {imode_delete,   "delete",   "del", "Delete task log",      "task"},
         {imode_report,   "report",   "rep", "Print logged time summary"},
         {imode_clear,    "clear",    "cl",  "Print summary and clear worklog"},
