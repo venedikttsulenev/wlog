@@ -91,6 +91,10 @@ double wl_get_time_spent(const char *task) {
     return index != WL_NOT_FOUND ? wl_spent[index] : 0;
 }
 
+int wl_exists(const char *task) {
+    return wl_task_index(task) != WL_NOT_FOUND;
+}
+
 int wl_rename_task(const char *task, const char *new_name) {
     int index = wl_task_index(task);
     if (index == WL_NOT_FOUND || wl_task_index(new_name) != WL_NOT_FOUND) {

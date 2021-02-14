@@ -32,4 +32,6 @@ void print_task_deleted_message(const char *task);
 
 void print_task_renamed_message(const char *oldname, const char *newname);
 
+void print_task_merged_message(const char *task, const char *task2, double seconds);
+
 #endif //WLOG_PRINT_H

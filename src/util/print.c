@@ -170,3 +170,7 @@ void print_task_deleted_message(const char *task) {
 void print_task_renamed_message(const char *oldname, const char *newname) {
     printf("Renamed %s to %s\n", format_task(oldname), format_task(newname));
 }
+
+void print_task_merged_message(const char *task, const char *task2, double seconds) {
+    printf("Merged %s into %s (+ %s)\n", format_task(task), format_task(task2), format_time_interval(seconds));
+}

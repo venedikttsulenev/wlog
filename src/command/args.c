@@ -64,7 +64,7 @@ void parse_task_name(char **dest, char *str) {
 const char *argname[] = {
         "time",
         "task",
-        "newname"
+        "task2"
 };
 
 void parse_arg(args_t *args, int argument) {
@@ -80,8 +80,8 @@ void parse_arg(args_t *args, int argument) {
         case ARG_TASK:
             parse_task_name(&args->task, arg_str);
             break;
-        case ARG_NEWNAME:
-            parse_task_name(&args->newname, arg_str);
+        case ARG_TASK2:
+            parse_task_name(&args->task2, arg_str);
             break;
         default:
             err_set(ERR_INTERNAL, "unknown argument type");

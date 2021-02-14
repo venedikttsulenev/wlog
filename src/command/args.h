@@ -7,11 +7,11 @@
 
 #define ARG_TIME 0
 #define ARG_TASK 1
-#define ARG_NEWNAME 2
+#define ARG_TASK2 2
 
 typedef struct {
     char *task;
-    char *newname;
+    char *task2;
     double time_seconds;
 } args_t;
 
