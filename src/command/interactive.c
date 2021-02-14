@@ -6,7 +6,7 @@
 #include "args.h"
 #include "../util/str.h"
 
-#define CMD_COUNT 14
+#define CMD_COUNT 15
 
 static wl_task_t i_current_task;
 static time_t i_current_task_start_time;
@@ -147,6 +147,17 @@ void imode_timer() {
     }
 }
 
+void imode_current() {
+    if (i_no_task_yet) {
+        print_no_task_message();
+    } else {
+        if (!i_break) {
+            i_last_spent += wl_log_since(&i_current_task_start_time, i_current_task);
+        }
+        print_task_current_message(i_current_task, i_last_spent, i_break);
+    }
+}
+
 void imode_unlog() {
     args_t args = args_get(2, ARG_TASK, ARG_TIME);
     if (!err_occured()) {
@@ -245,9 +256,10 @@ void imode_version() {
 }
 
 static command_t IMODE_COMMANDS[] = {
-        {imode_timer,    "timer",    "t",   "Start timer for 'task'. There can only be one timer running.", "task"},
+        {imode_timer,    "timer",    "t",   "Start timer for 'task'. There can only be one active timer.", "task"},
         {imode_break,    "break",    "br",  "Pause timer"},
         {imode_continue, "continue", "co",  "Resume timer"},
+        {imode_current,  "current",  "cur", "Print active timer info"},
         {imode_log,      "log",      "l",   "Log time", "task time"},
         {imode_unlog,    "unlog",    "u",   "Unlog time", "task time"},
         {imode_rename,   "rename",   "rn",  "Rename 'task' to 'task2'", "task task2"},

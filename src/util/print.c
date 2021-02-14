@@ -174,3 +174,15 @@ void print_task_renamed_message(const char *oldname, const char *newname) {
 void print_task_merged_message(const char *task, const char *task2, double seconds) {
     printf("Merged %s into %s (+ %s)\n", format_task(task), format_task(task2), format_time_interval(seconds));
 }
+
+void print_task_current_message(const char *task, double seconds, int paused) {
+    if (paused) {
+        printf("%s Active timer: %s (%s, paused)\n", current_time_str(), format_task(task), format_time_interval(seconds));
+    } else {
+        printf("%s Active timer: %s (%s)\n", current_time_str(), format_task(task), format_time_interval(seconds));
+    }
+}
+
+void print_no_task_message() {
+    puts("No timer set");
+}
