@@ -8,7 +8,8 @@ static const char *ERR_MSG[] = {
         "Unknown command",
         "Input error",
         "Error",
-        "Argument error"
+        "Argument error",
+        "Internal error"
 };
 
 static error_t err = ERR_NONE;
@@ -22,11 +23,17 @@ int err_occured() {
     return err.code;
 }
 
-int err_handle() {
+void err_print() {
     int code = err.code;
     if (code) {
         print_error(ERR_MSG[code], err.info);
     }
+}
+
+void err_reset() {
     err = ERR_NONE;
+}
+
+int err_code() {
     return err.code;
 }
