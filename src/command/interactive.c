@@ -154,7 +154,7 @@ void imode_current() {
         if (!i_break) {
             i_last_spent += wl_log_since(&i_current_task_start_time, i_current_task);
         }
-        print_task_current_message(i_current_task, i_last_spent, i_break);
+        print_task_current_message(i_current_task, i_last_spent, wl_get_time_spent(i_current_task), i_break);
     }
 }
 

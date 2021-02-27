@@ -34,7 +34,7 @@ void print_task_renamed_message(const char *oldname, const char *newname);
 
 void print_task_merged_message(const char *task, const char *task2, double seconds);
 
-void print_task_current_message(const char *task, double seconds, int paused);
+void print_task_current_message(const char *task, double seconds, double total_seconds, int paused);
 
 void print_no_task_message();
 
