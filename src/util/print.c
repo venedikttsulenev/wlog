@@ -175,12 +175,9 @@ void print_task_merged_message(const char *task, const char *task2, double secon
     printf("Merged %s into %s (+ %s)\n", format_task(task), format_task(task2), format_time_interval(seconds));
 }
 
-void print_task_current_message(const char *task, double seconds, int paused) {
-    if (paused) {
-        printf("%s Active timer: %s (%s, paused)\n", current_time_str(), format_task(task), format_time_interval(seconds));
-    } else {
-        printf("%s Active timer: %s (%s)\n", current_time_str(), format_task(task), format_time_interval(seconds));
-    }
+void print_task_current_message(const char *task, double seconds, double total_seconds, int paused) {
+    const char *format = paused ? "%s Active timer: %s (%s, %s total, paused)\n" : "%s Active timer: %s (%s, %s total)\n";
+    printf(format, current_time_str(), format_task(task), format_time_interval(seconds), format_time_interval(total_seconds));
 }
 
 void print_no_task_message() {

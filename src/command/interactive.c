@@ -154,18 +154,19 @@ void imode_current() {
         if (!i_break) {
             i_last_spent += wl_log_since(&i_current_task_start_time, i_current_task);
         }
-        print_task_current_message(i_current_task, i_last_spent, i_break);
+        print_task_current_message(i_current_task, i_last_spent, wl_get_time_spent(i_current_task), i_break);
     }
 }
 
 void imode_unlog() {
     args_t args = args_get(2, ARG_TASK, ARG_TIME);
-    if (!err_occured()) {
-        if (wl_unlog(args.time_seconds, args.task)) {
-            print_unlogged_time_message(args.task, args.time_seconds);
-        } else {
-            err_task_not_found(args.task);
-        }
+    if (err_occured()) { return; }
+
+    wl_log_since(&i_current_task_start_time, i_current_task);
+    if (wl_unlog(args.time_seconds, args.task)) {
+        print_unlogged_time_message(args.task, args.time_seconds);
+    } else {
+        err_task_not_found(args.task);
     }
 }
 
