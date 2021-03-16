@@ -19,7 +19,7 @@ Simple command-line time tracking utility
       v version                  - Print version
 
 ## ARGUMENTS
-Time is passed like **\***, **\*h\*m**, **\*h**, or **\*m**, where **\*** is a non-negative number
+Time is passed like **\***, **\*h\*m**, **\*h**, or **\*m**, where **\*** is a non-negative number    
 Task is a string containing max 31 characters from following list: **abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-/\:.**
 
 To leave a comment use '#' symbol:    
