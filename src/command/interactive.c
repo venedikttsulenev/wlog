@@ -85,9 +85,9 @@ void imode_run() {
                 command_t command = cmd_for_name(tok, IMODE_COMMANDS, NULL);
                 cmd_execute(command);
             }
+            imode_handle_error();
             free(input_str);
         }
-        imode_handle_error();
     } while (!i_stopped);
     imode_free();
 }
